@@ -6,28 +6,44 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'default', ...props }, ref) => {
-    const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+  ({ className, variant = 'default', size = 'default', style, ...props }, ref) => {
+    const baseStyle = {
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: '6px',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      border: 'none',
+      cursor: 'pointer',
+      transition: 'all 0.2s'
+    };
     
     const variants = {
-      default: "bg-primary text-primary-foreground hover:bg-primary/90",
-      destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-      outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-      secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-      ghost: "hover:bg-accent hover:text-accent-foreground",
-      link: "text-primary underline-offset-4 hover:underline",
-    }
+      default: { backgroundColor: '#3b82f6', color: 'white' },
+      destructive: { backgroundColor: '#ef4444', color: 'white' },
+      outline: { border: '1px solid #d1d5db', backgroundColor: 'white', color: '#374151' },
+      secondary: { backgroundColor: '#f3f4f6', color: '#374151' },
+      ghost: { backgroundColor: 'transparent', color: '#6b7280' },
+      link: { color: '#3b82f6', textDecoration: 'underline' },
+    };
     
     const sizes = {
-      default: "h-10 px-4 py-2",
-      sm: "h-9 rounded-md px-3",
-      lg: "h-11 rounded-md px-8",
-      icon: "h-10 w-10",
-    }
+      default: { height: '2.5rem', padding: '0 1rem' },
+      sm: { height: '2.25rem', padding: '0 0.75rem' },
+      lg: { height: '2.75rem', padding: '0 2rem' },
+      icon: { height: '2.5rem', width: '2.5rem' },
+    };
 
     return (
       <button
-        className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+        style={{
+          ...baseStyle,
+          ...variants[variant],
+          ...sizes[size],
+          ...style
+        }}
+        className={className}
         ref={ref}
         {...props}
       />

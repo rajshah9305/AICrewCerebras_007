@@ -1,4 +1,4 @@
-import './globals.css';
+// import './globals.css';
 
 export const metadata = {
   title: 'CrewCraft - AI Agent Platform',
@@ -12,7 +12,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, sans-serif' }}>{children}</body>
     </html>
   );
 }
