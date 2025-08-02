@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 interface Agent {
   id: string;
   name: string;
+  role: string;
   status: 'idle' | 'running' | 'completed';
   tasks: number;
   cost: number;
@@ -14,10 +15,12 @@ interface Agent {
 interface Task {
   id: string;
   title: string;
+  description: string;
   status: 'pending' | 'running' | 'completed';
   priority: 'low' | 'medium' | 'high';
   agent: string;
   progress: number;
+  outputFormat: string;
 }
 
 export default function Dashboard() {
@@ -26,20 +29,26 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isExecuting, setIsExecuting] = useState(false);
   const [logs, setLogs] = useState<string[]>([]);
-  const [systemStatus, setSystemStatus] = useState('ready');
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    priority: 'medium',
+    agent: 'auto-assign',
+    outputFormat: 'markdown'
+  });
 
   useEffect(() => {
     setAgents([
-      { id: '1', name: 'Research Analyst', status: 'idle', tasks: 12, cost: 45.67, performance: 94 },
-      { id: '2', name: 'Content Writer', status: 'running', tasks: 8, cost: 32.45, performance: 87 },
-      { id: '3', name: 'Data Scientist', status: 'idle', tasks: 15, cost: 67.89, performance: 91 },
-      { id: '4', name: 'Marketing Expert', status: 'completed', tasks: 6, cost: 23.12, performance: 96 }
+      { id: '1', name: 'Research Agent', role: 'Senior Researcher', status: 'idle', tasks: 12, cost: 45.67, performance: 94 },
+      { id: '2', name: 'Writer Agent', role: 'Content Creator', status: 'running', tasks: 8, cost: 32.45, performance: 87 },
+      { id: '3', name: 'Data Scientist', role: 'Analytics Expert', status: 'idle', tasks: 15, cost: 67.89, performance: 91 },
+      { id: '4', name: 'Marketing Expert', role: 'Strategy Specialist', status: 'completed', tasks: 6, cost: 23.12, performance: 96 }
     ]);
     setTasks([
-      { id: '1', title: 'Market Research Analysis', status: 'completed', priority: 'high', agent: 'Research Analyst', progress: 100 },
-      { id: '2', title: 'Content Creation', status: 'running', priority: 'medium', agent: 'Content Writer', progress: 65 },
-      { id: '3', title: 'Data Processing', status: 'pending', priority: 'high', agent: 'Data Scientist', progress: 0 },
-      { id: '4', title: 'Campaign Strategy', status: 'running', priority: 'low', agent: 'Marketing Expert', progress: 30 }
+      { id: '1', title: 'Market Research Analysis', description: 'Comprehensive market analysis for Q4', status: 'completed', priority: 'high', agent: 'Research Agent', progress: 100, outputFormat: 'PDF Report' },
+      { id: '2', title: 'Content Writing', description: 'Blog post about AI trends', status: 'running', priority: 'medium', agent: 'Writer Agent', progress: 65, outputFormat: 'Markdown' },
+      { id: '3', title: 'Data Processing', description: 'Clean and analyze customer data', status: 'pending', priority: 'high', agent: 'Data Scientist', progress: 0, outputFormat: 'CSV Export' },
+      { id: '4', title: 'Campaign Strategy', description: 'Develop marketing campaign for new product', status: 'running', priority: 'low', agent: 'Marketing Expert', progress: 30, outputFormat: 'Presentation' }
     ]);
   }, []);
 
@@ -49,12 +58,12 @@ export default function Dashboard() {
     
     const messages = [
       '⚙️ Loading agent configurations...',
-      '🤖 Research Analyst: Connecting to data sources...',
-      '✍️ Content Writer: Preparing content templates...',
+      '🤖 Research Agent: Connecting to data sources...',
+      '✍️ Writer Agent: Preparing content templates...',
       '📊 Data Scientist: Initializing analysis models...',
       '📈 Marketing Expert: Loading campaign frameworks...',
-      '🔍 Research Analyst: Gathering market intelligence...',
-      '📝 Content Writer: Generating content drafts...',
+      '🔍 Research Agent: Gathering market intelligence...',
+      '📝 Writer Agent: Generating content drafts...',
       '🧮 Data Scientist: Processing datasets...',
       '🎯 Marketing Expert: Optimizing targeting strategies...',
       '✅ All agents synchronized and ready',
@@ -69,17 +78,35 @@ export default function Dashboard() {
     setIsExecuting(false);
   };
 
+  const addTask = () => {
+    if (!newTask.title.trim()) return;
+    
+    const task: Task = {
+      id: Date.now().toString(),
+      title: newTask.title,
+      description: newTask.description,
+      status: 'pending',
+      priority: newTask.priority as 'low' | 'medium' | 'high',
+      agent: newTask.agent === 'auto-assign' ? 'Auto-assign best agent' : newTask.agent,
+      progress: 0,
+      outputFormat: newTask.outputFormat
+    };
+    
+    setTasks(prev => [...prev, task]);
+    setNewTask({ title: '', description: '', priority: 'medium', agent: 'auto-assign', outputFormat: 'markdown' });
+  };
+
   const styles = {
     container: {
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: activeTab === 'overview' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#f8fafc',
       fontFamily: 'system-ui, sans-serif',
-      color: 'white'
+      color: activeTab === 'overview' ? 'white' : '#1e293b'
     },
     header: {
-      background: 'rgba(255, 255, 255, 0.1)',
-      backdropFilter: 'blur(10px)',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+      background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.1)' : 'white',
+      backdropFilter: activeTab === 'overview' ? 'blur(10px)' : 'none',
+      borderBottom: activeTab === 'overview' ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #e2e8f0',
       padding: '1rem 2rem'
     },
     headerContent: {
@@ -92,7 +119,7 @@ export default function Dashboard() {
     title: {
       fontSize: '1.8rem',
       fontWeight: 'bold',
-      color: 'white',
+      color: activeTab === 'overview' ? 'white' : '#1e293b',
       margin: 0,
       display: 'flex',
       alignItems: 'center',
@@ -138,9 +165,9 @@ export default function Dashboard() {
       cursor: 'not-allowed'
     },
     nav: {
-      background: 'rgba(255, 255, 255, 0.05)',
+      background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.05)' : 'white',
       padding: '0 2rem',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+      borderBottom: activeTab === 'overview' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0'
     },
     navContent: {
       maxWidth: '1400px',
@@ -173,18 +200,70 @@ export default function Dashboard() {
       marginBottom: '2rem'
     },
     card: {
-      background: 'rgba(255, 255, 255, 0.1)',
-      backdropFilter: 'blur(10px)',
+      background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.1)' : 'white',
+      backdropFilter: activeTab === 'overview' ? 'blur(10px)' : 'none',
       borderRadius: '12px',
       padding: '1.5rem',
-      border: '1px solid rgba(255, 255, 255, 0.2)',
-      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+      border: activeTab === 'overview' ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #e2e8f0',
+      boxShadow: activeTab === 'overview' ? '0 8px 32px rgba(0, 0, 0, 0.1)' : '0 1px 3px rgba(0, 0, 0, 0.1)'
     },
     cardTitle: {
       fontSize: '1.125rem',
       fontWeight: '600',
-      color: 'white',
+      color: activeTab === 'overview' ? 'white' : '#1e293b',
       marginBottom: '1rem',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem'
+    },
+    formGroup: {
+      marginBottom: '1rem'
+    },
+    label: {
+      display: 'block',
+      fontSize: '0.875rem',
+      fontWeight: '500',
+      color: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.9)' : '#374151',
+      marginBottom: '0.5rem'
+    },
+    input: {
+      width: '100%',
+      padding: '0.75rem',
+      borderRadius: '6px',
+      border: '1px solid #d1d5db',
+      fontSize: '0.875rem',
+      background: 'white',
+      color: '#1f2937'
+    },
+    textarea: {
+      width: '100%',
+      padding: '0.75rem',
+      borderRadius: '6px',
+      border: '1px solid #d1d5db',
+      fontSize: '0.875rem',
+      background: 'white',
+      color: '#1f2937',
+      minHeight: '100px',
+      resize: 'vertical' as const
+    },
+    select: {
+      width: '100%',
+      padding: '0.75rem',
+      borderRadius: '6px',
+      border: '1px solid #d1d5db',
+      fontSize: '0.875rem',
+      background: 'white',
+      color: '#1f2937'
+    },
+    addButton: {
+      background: 'linear-gradient(135deg, #10b981, #059669)',
+      color: 'white',
+      border: 'none',
+      padding: '0.75rem 1.5rem',
+      borderRadius: '6px',
+      cursor: 'pointer',
+      fontSize: '0.875rem',
+      fontWeight: '600',
       display: 'flex',
       alignItems: 'center',
       gap: '0.5rem'
@@ -196,22 +275,23 @@ export default function Dashboard() {
       marginBottom: '2rem'
     },
     statCard: {
-      background: 'rgba(255, 255, 255, 0.15)',
-      backdropFilter: 'blur(10px)',
+      background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.15)' : 'white',
+      backdropFilter: activeTab === 'overview' ? 'blur(10px)' : 'none',
       borderRadius: '12px',
       padding: '1.5rem',
       textAlign: 'center' as const,
-      border: '1px solid rgba(255, 255, 255, 0.2)'
+      border: activeTab === 'overview' ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid #e2e8f0',
+      boxShadow: activeTab === 'overview' ? 'none' : '0 1px 3px rgba(0, 0, 0, 0.1)'
     },
     statValue: {
       fontSize: '2.5rem',
       fontWeight: 'bold',
-      color: 'white',
+      color: activeTab === 'overview' ? 'white' : '#1e293b',
       margin: '0.5rem 0'
     },
     statLabel: {
       fontSize: '0.875rem',
-      color: 'rgba(255, 255, 255, 0.8)',
+      color: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.8)' : '#64748b',
       margin: 0
     },
     agentItem: {
@@ -219,10 +299,10 @@ export default function Dashboard() {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '1rem',
-      background: 'rgba(255, 255, 255, 0.05)',
+      background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.05)' : '#f8fafc',
       borderRadius: '8px',
       marginBottom: '0.75rem',
-      border: '1px solid rgba(255, 255, 255, 0.1)'
+      border: activeTab === 'overview' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0'
     },
     agentInfo: {
       display: 'flex',
@@ -230,13 +310,13 @@ export default function Dashboard() {
     },
     agentName: {
       fontWeight: '600',
-      color: 'white',
+      color: activeTab === 'overview' ? 'white' : '#1e293b',
       margin: 0,
       fontSize: '0.95rem'
     },
     agentStats: {
       fontSize: '0.75rem',
-      color: 'rgba(255, 255, 255, 0.7)',
+      color: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.7)' : '#64748b',
       margin: '0.25rem 0 0 0'
     },
     status: {
@@ -247,17 +327,17 @@ export default function Dashboard() {
     },
     statusIdle: {
       background: 'rgba(156, 163, 175, 0.2)',
-      color: '#d1d5db',
+      color: activeTab === 'overview' ? '#d1d5db' : '#6b7280',
       border: '1px solid rgba(156, 163, 175, 0.3)'
     },
     statusRunning: {
       background: 'rgba(59, 130, 246, 0.2)',
-      color: '#60a5fa',
+      color: '#3b82f6',
       border: '1px solid rgba(59, 130, 246, 0.3)'
     },
     statusCompleted: {
       background: 'rgba(34, 197, 94, 0.2)',
-      color: '#4ade80',
+      color: '#22c55e',
       border: '1px solid rgba(34, 197, 94, 0.3)'
     },
     logs: {
@@ -276,15 +356,15 @@ export default function Dashboard() {
       justifyContent: 'space-between',
       alignItems: 'center',
       padding: '1rem',
-      background: 'rgba(255, 255, 255, 0.05)',
+      background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.05)' : '#f8fafc',
       borderRadius: '8px',
       marginBottom: '0.75rem',
-      border: '1px solid rgba(255, 255, 255, 0.1)'
+      border: activeTab === 'overview' ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0'
     },
     progressBar: {
       width: '100%',
       height: '4px',
-      background: 'rgba(255, 255, 255, 0.1)',
+      background: activeTab === 'overview' ? 'rgba(255, 255, 255, 0.1)' : '#e5e7eb',
       borderRadius: '2px',
       marginTop: '0.5rem',
       overflow: 'hidden'
@@ -297,17 +377,17 @@ export default function Dashboard() {
     },
     priorityHigh: {
       background: 'rgba(239, 68, 68, 0.2)',
-      color: '#f87171',
+      color: '#ef4444',
       border: '1px solid rgba(239, 68, 68, 0.3)'
     },
     priorityMedium: {
       background: 'rgba(245, 158, 11, 0.2)',
-      color: '#fbbf24',
+      color: '#f59e0b',
       border: '1px solid rgba(245, 158, 11, 0.3)'
     },
     priorityLow: {
       background: 'rgba(34, 197, 94, 0.2)',
-      color: '#4ade80',
+      color: '#22c55e',
       border: '1px solid rgba(34, 197, 94, 0.3)'
     }
   };
@@ -325,11 +405,11 @@ export default function Dashboard() {
         </div>
         <div style={styles.statCard}>
           <p style={styles.statLabel}>Success Rate</p>
-          <p style={styles.statValue}>94.2%</p>
+          <p style={styles.statValue}>94%</p>
         </div>
         <div style={styles.statCard}>
           <p style={styles.statLabel}>Total Cost</p>
-          <p style={styles.statValue}>$127.45</p>
+          <p style={styles.statValue}>$127</p>
         </div>
       </div>
 
@@ -352,7 +432,7 @@ export default function Dashboard() {
             <div key={agent.id} style={styles.agentItem}>
               <div style={styles.agentInfo}>
                 <p style={styles.agentName}>{agent.name}</p>
-                <p style={styles.agentStats}>{agent.tasks} tasks • ${agent.cost} • {agent.performance}% performance</p>
+                <p style={styles.agentStats}>{agent.tasks} tasks • ${agent.cost}</p>
               </div>
               <span style={{
                 ...styles.status,
@@ -367,25 +447,12 @@ export default function Dashboard() {
         </div>
 
         <div style={styles.card}>
-          <h3 style={styles.cardTitle}>📋 Task Queue</h3>
+          <h3 style={styles.cardTitle}>📋 Recent Tasks</h3>
           {tasks.map(task => (
             <div key={task.id} style={styles.taskItem}>
               <div style={styles.agentInfo}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                  <p style={styles.agentName}>{task.title}</p>
-                  <span style={{
-                    ...styles.status,
-                    ...(task.priority === 'high' ? styles.priorityHigh :
-                        task.priority === 'medium' ? styles.priorityMedium :
-                        styles.priorityLow)
-                  }}>
-                    {task.priority}
-                  </span>
-                </div>
+                <p style={styles.agentName}>{task.title}</p>
                 <p style={styles.agentStats}>Assigned to {task.agent}</p>
-                <div style={styles.progressBar}>
-                  <div style={{...styles.progressFill, width: `${task.progress}%`}}></div>
-                </div>
               </div>
               <span style={{
                 ...styles.status,
@@ -398,6 +465,108 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
+      </div>
+    </>
+  );
+
+  const renderTasks = () => (
+    <>
+      <div style={styles.card}>
+        <h3 style={styles.cardTitle}>📋 Add New Task</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Task Name</label>
+            <input
+              style={styles.input}
+              placeholder="e.g., Market Research Analysis"
+              value={newTask.title}
+              onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Priority Level</label>
+            <select
+              style={styles.select}
+              value={newTask.priority}
+              onChange={(e) => setNewTask({...newTask, priority: e.target.value})}
+            >
+              <option value="low">🟢 Low Priority</option>
+              <option value="medium">🟡 Medium Priority</option>
+              <option value="high">🔴 High Priority</option>
+            </select>
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Assigned Agent</label>
+            <select
+              style={styles.select}
+              value={newTask.agent}
+              onChange={(e) => setNewTask({...newTask, agent: e.target.value})}
+            >
+              <option value="auto-assign">🤖 Auto-assign best agent</option>
+              {agents.map(agent => (
+                <option key={agent.id} value={agent.name}>{agent.name}</option>
+              ))}
+            </select>
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>Output Format</label>
+            <select
+              style={styles.select}
+              value={newTask.outputFormat}
+              onChange={(e) => setNewTask({...newTask, outputFormat: e.target.value})}
+            >
+              <option value="markdown">📝 Markdown Report</option>
+              <option value="pdf">📄 PDF Document</option>
+              <option value="csv">📊 CSV Export</option>
+              <option value="presentation">📈 Presentation</option>
+            </select>
+          </div>
+        </div>
+        <div style={styles.formGroup}>
+          <label style={styles.label}>Task Description</label>
+          <textarea
+            style={styles.textarea}
+            placeholder="Provide detailed instructions for what the agent should accomplish..."
+            value={newTask.description}
+            onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+          />
+        </div>
+        <button style={styles.addButton} onClick={addTask}>
+          ➕ Add Task
+        </button>
+      </div>
+
+      <div style={styles.card}>
+        <h3 style={styles.cardTitle}>📋 Task Queue ({tasks.length})</h3>
+        {tasks.map(task => (
+          <div key={task.id} style={styles.taskItem}>
+            <div style={styles.agentInfo}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <p style={styles.agentName}>{task.title}</p>
+                <span style={{
+                  ...styles.status,
+                  ...(task.priority === 'high' ? styles.priorityHigh :
+                      task.priority === 'medium' ? styles.priorityMedium :
+                      styles.priorityLow)
+                }}>
+                  {task.priority}
+                </span>
+              </div>
+              <p style={styles.agentStats}>Assigned to {task.agent}</p>
+              <div style={styles.progressBar}>
+                <div style={{...styles.progressFill, width: `${task.progress}%`}}></div>
+              </div>
+            </div>
+            <span style={{
+              ...styles.status,
+              ...(task.status === 'pending' ? styles.statusIdle :
+                  task.status === 'running' ? styles.statusRunning :
+                  styles.statusCompleted)
+            }}>
+              {task.status}
+            </span>
+          </div>
+        ))}
       </div>
     </>
   );
@@ -436,23 +605,37 @@ export default function Dashboard() {
 
       <nav style={styles.nav}>
         <div style={styles.navContent}>
-          {['overview', 'agents', 'tasks', 'templates', 'execute', 'analytics', 'files'].map(tab => (
+          {[
+            { key: 'overview', label: 'Overview' },
+            { key: 'agents', label: `Agents (${agents.length})` },
+            { key: 'tasks', label: `Tasks (${tasks.length})` },
+            { key: 'templates', label: 'Templates (4)' },
+            { key: 'execute', label: 'Execute' },
+            { key: 'analytics', label: 'Analytics' },
+            { key: 'files', label: 'Files (4)' }
+          ].map(tab => (
             <div
-              key={tab}
+              key={tab.key}
               style={{
                 ...styles.navItem,
-                ...(activeTab === tab ? styles.navItemActive : {})
+                ...(activeTab === tab.key ? styles.navItemActive : {})
               }}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setActiveTab(tab.key)}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)} {tab !== 'overview' && agents.length > 0 && `(${tab === 'agents' ? agents.length : tasks.length})`}
+              {tab.label}
             </div>
           ))}
         </div>
       </nav>
 
       <main style={styles.main}>
-        {renderOverview()}
+        {activeTab === 'overview' && renderOverview()}
+        {activeTab === 'tasks' && renderTasks()}
+        {activeTab === 'agents' && renderOverview()}
+        {activeTab === 'templates' && renderTasks()}
+        {activeTab === 'execute' && renderOverview()}
+        {activeTab === 'analytics' && renderOverview()}
+        {activeTab === 'files' && renderTasks()}
       </main>
 
       <style jsx>{`
