@@ -1,365 +1,285 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-const Bot = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <rect x="3" y="11" width="18" height="10" rx="2" ry="2"/>
-    <circle cx="12" cy="5" r="2"/>
-    <path d="M12 7v4"/>
-    <line x1="8" y1="16" x2="8" y2="16"/>
-    <line x1="16" y1="16" x2="16" y2="16"/>
-  </svg>
-);
+export default function CrewAIDashboard() {
+  const [activeTab, setActiveTab] = useState('Tasks');
+  const [showModal, setShowModal] = useState(false);
 
-const Monitor = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-    <line x1="8" y1="21" x2="16" y2="21"/>
-    <line x1="12" y1="17" x2="12" y2="21"/>
-  </svg>
-);
+  const tabs = [
+    { name: 'Agents', count: 4 },
+    { name: 'Tasks', count: 4 },
+    { name: 'Templates', count: 4 },
+    { name: 'Execute', count: null },
+    { name: 'Analytics', count: null },
+    { name: 'Files', count: 3 }
+  ];
 
-const Users = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-    <circle cx="9" cy="7" r="4"/>
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-  </svg>
-);
-
-const Plus = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <line x1="12" y1="5" x2="12" y2="19"/>
-    <line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>
-);
-
-const BarChart = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <line x1="12" y1="20" x2="12" y2="10"/>
-    <line x1="18" y1="20" x2="18" y2="4"/>
-    <line x1="6" y1="20" x2="6" y2="16"/>
-  </svg>
-);
-
-const Settings = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <circle cx="12" cy="12" r="3"/>
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-  </svg>
-);
-
-export default function CrewCraftHub() {
-  const [currentView, setCurrentView] = useState('dashboard');
-
-  const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: Bot },
-    { id: "templates", label: "Templates", icon: Monitor },
-    { id: "my-agents", label: "My Agents", icon: Users, badge: 0 },
-    { id: "create", label: "Create Agent", icon: Plus },
-    { id: "analytics", label: "Analytics", icon: BarChart },
-    { id: "settings", label: "API Settings", icon: Settings }
+  const files = [
+    { name: 'crew_results_b986bf25-ebeb-4b9c-90d1-40e57398e598_20250801_211949.md', size: '4.4 KB', date: '2024-08-01' },
+    { name: 'market-analysis-report.pdf', size: '4.2 KB', date: '2024-08-01' },
+    { name: 'competitor-research.xlsx', size: '2.8 KB', date: '2024-08-01' }
   ];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc', fontFamily: 'system-ui, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #7c2d12 100%)', color: 'white', fontFamily: 'system-ui, sans-serif' }}>
       {/* Header */}
-      <header style={{ backgroundColor: 'white', padding: '1rem 2rem', borderBottom: '1px solid #e2e8f0' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* Logo */}
+      <header style={{ padding: '1rem 2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{ 
-              width: '40px', 
-              height: '40px', 
-              background: 'linear-gradient(135deg, #4f46e5, #7c3aed)', 
-              borderRadius: '12px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              position: 'relative'
+              width: '32px', 
+              height: '32px', 
+              backgroundColor: 'rgba(255,255,255,0.2)', 
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}>
-              <Bot style={{ width: '24px', height: '24px', color: 'white' }} />
-              <div style={{ 
-                position: 'absolute', 
-                top: '-2px', 
-                right: '-2px', 
-                width: '12px', 
-                height: '12px', 
-                backgroundColor: '#10b981', 
-                borderRadius: '50%',
-                border: '2px solid white'
-              }}></div>
+              ☁️
             </div>
             <div>
-              <h1 style={{ 
-                fontSize: '20px', 
-                fontWeight: 'bold', 
-                margin: 0,
-                background: 'linear-gradient(135deg, #4f46e5, #7c3aed)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
-                CrewCraft
-              </h1>
-              <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>AI Agent Platform</p>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0 }}>CrewAI Dashboard</h1>
+              <p style={{ fontSize: '0.875rem', opacity: 0.8, margin: 0 }}>Powered by Cerebras AI Models</p>
             </div>
           </div>
-
-          {/* Navigation */}
-          <nav style={{ display: 'flex', gap: '8px' }}>
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentView === item.id;
-              
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setCurrentView(item.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    border: 'none',
-                    backgroundColor: isActive ? '#4f46e5' : 'transparent',
-                    color: isActive ? 'white' : '#64748b',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <Icon style={{ width: '16px', height: '16px' }} />
-                  {item.label}
-                  {item.badge !== undefined && (
-                    <span style={{
-                      backgroundColor: isActive ? 'rgba(255,255,255,0.2)' : '#e2e8f0',
-                      color: isActive ? 'white' : '#64748b',
-                      padding: '2px 6px',
-                      borderRadius: '10px',
-                      fontSize: '12px',
-                      fontWeight: '600'
-                    }}>
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Badge style={{ backgroundColor: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+              ● System Ready
+            </Badge>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '0.875rem', opacity: 0.8 }}>Total Cost</div>
+              <div style={{ fontSize: '1.125rem', fontWeight: 'bold' }}>$127.45</div>
+            </div>
+          </div>
         </div>
       </header>
 
+      {/* Navigation Tabs */}
+      <nav style={{ padding: '0 2rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          {tabs.map((tab) => (
+            <button
+              key={tab.name}
+              onClick={() => setActiveTab(tab.name)}
+              style={{
+                padding: '1rem 0',
+                background: 'none',
+                border: 'none',
+                color: activeTab === tab.name ? '#60a5fa' : 'rgba(255,255,255,0.7)',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                cursor: 'pointer',
+                borderBottom: activeTab === tab.name ? '2px solid #60a5fa' : '2px solid transparent',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              {tab.name}
+              {tab.count && (
+                <span style={{ 
+                  backgroundColor: 'rgba(255,255,255,0.2)', 
+                  padding: '0.125rem 0.375rem', 
+                  borderRadius: '0.75rem', 
+                  fontSize: '0.75rem' 
+                }}>
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+      </nav>
+
       {/* Main Content */}
-      <main style={{ maxWidth: '1400px', margin: '0 auto', padding: '32px' }}>
-        {currentView === 'dashboard' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            {/* Hero Section */}
-            <div style={{
-              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%)',
-              borderRadius: '24px',
-              padding: '48px',
-              color: 'white',
-              textAlign: 'center',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <Badge style={{
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  color: 'white',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  marginBottom: '24px'
-                }}>
-                  🚀 CrewAI Platform v2.0 - Powered by Cerebras
-                </Badge>
-                
-                <h1 style={{
-                  fontSize: '48px',
-                  fontWeight: 'bold',
-                  lineHeight: '1.1',
-                  marginBottom: '16px'
-                }}>
-                  Build Powerful
-                </h1>
-                <h1 style={{
-                  fontSize: '48px',
-                  fontWeight: 'bold',
-                  lineHeight: '1.1',
-                  marginBottom: '16px',
-                  background: 'linear-gradient(135deg, #fbbf24, #f472b6)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent'
-                }}>
-                  AI Agent Teams
-                </h1>
-                <h1 style={{
-                  fontSize: '48px',
-                  fontWeight: 'bold',
-                  lineHeight: '1.1',
-                  marginBottom: '24px'
-                }}>
-                  in Minutes
-                </h1>
-                
-                <p style={{
-                  fontSize: '18px',
-                  opacity: 0.9,
-                  maxWidth: '600px',
-                  margin: '0 auto 32px auto',
-                  lineHeight: '1.6'
-                }}>
-                  Create, coordinate, and deploy intelligent AI agent crews powered by Cerebras' ultra-fast inference. Build sophisticated multi-agent workflows with our intuitive platform.
-                </p>
-                
-                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-                  <Button
-                    onClick={() => setCurrentView('templates')}
-                    style={{
-                      backgroundColor: 'white',
-                      color: '#4f46e5',
-                      padding: '12px 24px',
-                      fontSize: '16px',
-                      fontWeight: '600',
-                      boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                    }}
-                  >
-                    <Monitor style={{ width: '20px', height: '20px', marginRight: '8px' }} />
-                    Explore Templates
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setCurrentView('create')}
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.1)',
-                      color: 'white',
-                      border: '1px solid rgba(255,255,255,0.3)',
-                      padding: '12px 24px',
-                      fontSize: '16px',
-                      fontWeight: '600'
-                    }}
-                  >
-                    <Plus style={{ width: '20px', height: '20px', marginRight: '8px' }} />
-                    Create Crew
-                  </Button>
-                </div>
-              </div>
+      <main style={{ padding: '2rem' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          {/* Generated Files Section */}
+          <div style={{ marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+              <span>📁</span>
+              <h2 style={{ fontSize: '1.125rem', fontWeight: '600', margin: 0 }}>Generated Files</h2>
+              <span style={{ fontSize: '0.875rem', opacity: 0.7 }}>Total size: 11.4 KB</span>
             </div>
 
-            {/* Stats Grid */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '24px'
-            }}>
-              {[
-                { 
-                  title: "Active Agents", 
-                  value: "2", 
-                  trend: "+12%", 
-                  color: "#3b82f6",
-                  bgColor: "#dbeafe",
-                  icon: "🤖"
-                },
-                { 
-                  title: "Templates Available", 
-                  value: "6", 
-                  trend: "+3 new", 
-                  color: "#8b5cf6",
-                  bgColor: "#e9d5ff",
-                  icon: "📋"
-                },
-                { 
-                  title: "Total Tasks", 
-                  value: "1,247", 
-                  trend: "+18%", 
-                  color: "#10b981",
-                  bgColor: "#d1fae5",
-                  icon: "📊"
-                },
-                { 
-                  title: "Success Rate", 
-                  value: "94.2%", 
-                  trend: "+2.1%", 
-                  color: "#f59e0b",
-                  bgColor: "#fef3c7",
-                  icon: "🎯"
-                }
-              ].map((stat, index) => (
-                <Card key={index} style={{
-                  backgroundColor: stat.bgColor,
-                  border: 'none',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  position: 'relative'
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {files.map((file, index) => (
+                <Card key={index} style={{ 
+                  backgroundColor: 'rgba(255,255,255,0.05)', 
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(10px)'
                 }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: '80px',
-                    height: '80px',
-                    backgroundColor: stat.color,
-                    opacity: 0.1,
-                    borderBottomLeftRadius: '24px'
-                  }} />
-                  
-                  <CardHeader style={{ paddingBottom: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{
-                        width: '48px',
-                        height: '48px',
-                        backgroundColor: stat.color,
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px'
-                      }}>
-                        {stat.icon}
+                  <CardContent style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '1.25rem' }}>
+                        {file.name.endsWith('.md') ? '📄' : file.name.endsWith('.pdf') ? '📋' : '📊'}
+                      </span>
+                      <div>
+                        <div style={{ fontWeight: '500', marginBottom: '0.25rem' }}>{file.name}</div>
+                        <div style={{ fontSize: '0.875rem', opacity: 0.7 }}>{file.size} • {file.date}</div>
                       </div>
-                      <Badge style={{
-                        backgroundColor: '#dcfce7',
-                        color: '#166534',
-                        border: '1px solid #bbf7d0'
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button 
+                        onClick={() => setShowModal(true)}
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          color: 'rgba(255,255,255,0.7)', 
+                          cursor: 'pointer',
+                          padding: '0.5rem',
+                          borderRadius: '0.25rem'
+                        }}
+                      >
+                        👁️
+                      </button>
+                      <button style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'rgba(255,255,255,0.7)', 
+                        cursor: 'pointer',
+                        padding: '0.5rem',
+                        borderRadius: '0.25rem'
                       }}>
-                        {stat.trend}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  
-                  <CardContent>
-                    <div style={{ fontSize: '36px', fontWeight: 'bold', color: stat.color, marginBottom: '4px' }}>
-                      {stat.value}
-                    </div>
-                    <div style={{ fontSize: '14px', fontWeight: '500', color: stat.color }}>
-                      {stat.title}
+                        📥
+                      </button>
+                      <button style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'rgba(255,255,255,0.7)', 
+                        cursor: 'pointer',
+                        padding: '0.5rem',
+                        borderRadius: '0.25rem'
+                      }}>
+                        🗑️
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </div>
-        )}
-
-        {/* Other Views */}
-        {currentView !== 'dashboard' && (
-          <div style={{ textAlign: 'center', padding: '80px 0' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937', marginBottom: '16px' }}>
-              {currentView.charAt(0).toUpperCase() + currentView.slice(1).replace('-', ' ')}
-            </h2>
-            <p style={{ color: '#6b7280', fontSize: '16px' }}>
-              This section is under development
-            </p>
-          </div>
-        )}
+        </div>
       </main>
+
+      {/* Run Crew Button */}
+      <div style={{ position: 'fixed', bottom: '2rem', right: '2rem' }}>
+        <Button style={{
+          background: 'linear-gradient(135deg, #10b981, #059669)',
+          color: 'white',
+          padding: '0.75rem 1.5rem',
+          borderRadius: '2rem',
+          fontSize: '1rem',
+          fontWeight: '600',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
+          border: 'none',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem'
+        }}>
+          🚀 Run Crew
+        </Button>
+      </div>
+
+      {/* File Preview Modal */}
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            color: 'black',
+            borderRadius: '0.75rem',
+            padding: '2rem',
+            maxWidth: '800px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflow: 'auto'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span>📄</span>
+                <span style={{ fontWeight: '600' }}>crew_results_b986bf25-ebeb-4b9c-90d1-40e57398e598_20250801_211949.md</span>
+              </div>
+              <button 
+                onClick={() => setShowModal(false)}
+                style={{ 
+                  background: 'none', 
+                  border: 'none', 
+                  fontSize: '1.5rem', 
+                  cursor: 'pointer',
+                  color: '#6b7280'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div style={{ 
+              backgroundColor: '#f8fafc', 
+              padding: '1.5rem', 
+              borderRadius: '0.5rem', 
+              fontFamily: 'monospace',
+              fontSize: '0.875rem',
+              lineHeight: '1.6',
+              marginBottom: '1.5rem'
+            }}>
+              <div># crew_results_b986bf25-ebeb-4b9c-90d1-40e57398e598_20250801_211949.md</div>
+              <br />
+              <div>Generated content for crew_results_b986bf25-ebeb-4b9c-90d1-40e57398e598_20250801_211949.md</div>
+              <br />
+              <div>Created: 2025-08-01, 9:19:49 PM</div>
+              <div>Size: 4.4 KB</div>
+              <div>Type: report</div>
+              <br />
+              <div>This is a sample file content. In a real implementation, this would contain the actual file data.</div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
+              <Button style={{
+                backgroundColor: '#10b981',
+                color: 'white',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.375rem',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}>
+                📥 Download
+              </Button>
+              <Button 
+                onClick={() => setShowModal(false)}
+                style={{
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '0.375rem',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
