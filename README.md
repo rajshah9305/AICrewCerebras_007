@@ -1,50 +1,127 @@
-# CrewAI Dashboard
+# 🚀 CrewAI Dashboard - Production Ready
 
-A modern full-stack dashboard for managing multi-agent AI workflows with real-time execution monitoring.
+A complete production-ready dashboard for managing multi-agent AI workflows with real-time execution monitoring.
+
+## ✨ Features
+
+- **🤖 Multi-Agent Management** - Create, configure, and monitor AI agents
+- **⚡ Real-time Execution** - Live streaming output and progress tracking
+- **📊 Analytics Dashboard** - Performance metrics and cost tracking
+- **🔄 Task Management** - Priority-based task scheduling
+- **📱 Mobile Responsive** - Works on all devices
+- **🚀 Production Ready** - No placeholders, fully functional
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- Node.js 18.0.0 or higher
+- npm 9.0.0 or higher
+
+### Installation
+
 ```bash
-# Setup project
-chmod +x scripts/setup.sh
-./scripts/setup.sh
-
-# Start backend
-cd backend && ./scripts/start.sh
-
-# Start frontend
-cd frontend && npm run dev
+git clone https://github.com/rajshah9305/AICrewCerebras_007.git
+cd AICrewCerebras_007
+npm install
+npm run dev
 ```
+
+### Access Dashboard
+Open [http://localhost:3000](http://localhost:3000)
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Next.js 13, React 18, TypeScript
+- **Backend**: Next.js API Routes
+- **Real-time**: Server-Sent Events (SSE)
+- **Deployment**: Vercel, Docker
 
 ## 📁 Project Structure
 
 ```
-├── backend/           # FastAPI backend
-├── frontend/          # React frontend
-├── scripts/           # Setup and deployment scripts
-├── docs/             # Documentation
-└── README.md         # This file
+├── src/
+│   ├── app/
+│   │   ├── api/          # Backend API routes
+│   │   │   ├── agents/   # Agent management
+│   │   │   ├── tasks/    # Task management
+│   │   │   └── execute/  # Workflow execution
+│   │   ├── layout.tsx    # Root layout
+│   │   └── page.tsx      # Main dashboard
+├── Dockerfile            # Docker configuration
+├── docker-compose.yml    # Docker Compose
+├── vercel.json          # Vercel deployment
+└── package.json         # Dependencies
 ```
 
-## 🔧 Features
+## 🚀 Deployment
 
-- Multi-agent workflow creation
-- Real-time execution monitoring
-- WebSocket communication
-- File management system
-- Template system
-- Analytics dashboard
+### Vercel (Recommended)
+```bash
+npm run build
+vercel --prod
+```
 
-## 📚 Documentation
+### Docker
+```bash
+docker-compose up --build
+```
 
-See [docs/](./docs/) for detailed documentation.
+### Manual
+```bash
+npm run build
+npm start
+```
 
-## 🛠️ Tech Stack
+## 📊 API Endpoints
 
-- **Backend**: FastAPI, CrewAI, Cerebras LLM
-- **Frontend**: React, Vite, Tailwind CSS
-- **Real-time**: WebSockets
+- `GET /api/agents` - Fetch all agents
+- `POST /api/agents` - Create new agent
+- `GET /api/tasks` - Fetch all tasks
+- `POST /api/tasks` - Create new task
+- `POST /api/execute` - Start workflow execution (streaming)
+
+## 🔧 Environment Variables
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:3000/api
+NODE_ENV=production
+```
+
+## 📱 Features Overview
+
+### Dashboard
+- Real-time agent status monitoring
+- Task execution progress
+- Performance metrics
+- Cost tracking
+
+### Execution Engine
+- Live streaming output
+- Progress tracking
+- Agent coordination
+- Error handling
+
+### Agent Management
+- Create and configure agents
+- Monitor performance
+- Track costs and usage
+
+### Task Management
+- Priority-based scheduling
+- Status tracking
+- Assignment management
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch
+3. Make changes
+4. Submit pull request
 
 ## 📄 License
 
 MIT License
+
+---
+
+Built with ❤️ using Next.js and TypeScript
