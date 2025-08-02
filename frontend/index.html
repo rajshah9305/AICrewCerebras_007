@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrewAI Dashboard - Advanced AI Workflow Management</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        function CrewAIDashboard() {
+            const [activeTab, setActiveTab] = useState('agents');
+            const [agents, setAgents] = useState([]);
+            const [tasks, setTasks] = useState([]);
+            const [templates, setTemplates] = useState([
+                {
+                    id: 1,
+                    name: "Research & Analysis Team",
+                    description: "Multi-agent research workflow with analyst, researcher, and writer",
+                    agents: 3,
+                    tasks: 5,
+                    category: "Research",
+                    rating: 4.8,
+                    featured: true,
+                    cost: "$0.15/run"
+                },
+                {
+                    id: 2,
+                    name: "Content Creation Squad",
+                    description: "SEO-optimized content creation with strategist and editor",
+                    agents: 2,
+                    tasks: 4,
+                    category: "Marketing",
+                    rating: 4.6,
+                    featured: false,
+                    cost: "$0.12/run"
+                },
+                {
+                    id: 3,
+                    name: "Code Review Team",
+                    description: "Automated code review with security and performance analysis",
+                    agents: 3,
+                    tasks: 6,
+                    category: "Development",
+                    rating: 4.9,
+                    featured: true,
+                    cost: "$0.18/run"
+                },
+                {
+                    id: 4,
+                    name: "Professional Resume Creation",
+                    description: "Expert resume writing team for career advancement",
+                    agents: 4,
+                    tasks: 4,
+                    category: "Career",
+                    rating: 4.7,
+                    featured: true,
+                    cost: "$0.22/run"
+                }
+            ]);
+            
+            const [files, setFiles] = useState([
+                {
+                    id: 1,
+                    name: 'market-analysis-report.md',
+                    size: '4.2 KB',
+                    date: '2024-01-15 10:30:00',
+                    type: 'report',
+                    status: 'completed'
+                },
+                {
+                    id: 2,
+                    name: 'competitor-research.json',
+                    size: '2.8 KB',
+                    date: '2024-01-15 09:15:00',
+                    type: 'data',
+                    status: 'completed'
+                }
+            ]);
+
+            const [analytics, setAnalytics] = useState({
+                totalExecutions: 47,
+                successRate: 94.2,
+                avgDuration: '2m 34s',
+                totalTokens: 847293,
+                totalCost: 127.45,
+                topPerformingAgent: 'Research Analyst',
+                weeklyTrend: '+12.4%'
+            });
+
+            const [isExecuting, setIsExecuting] = useState(false);
+            const [executionOutput, setExecutionOutput] = useState('');
+            const [executionLogs, setExecutionLogs] = useState([]);
+            const [executionProgress, setExecutionProgress] = useState(0);
+            const [executionStats, setExecutionStats] = useState({
+                tokensUsed: 0,
+                apiCalls: 0,
+                estimatedCost: 0,
+                duration: 0
+            });
+            
+            const [agentForm, setAgentForm] = useState({
+                role: '',
+                goal: '',
+                backstory: '',
+                tools: [],
+                maxIterations: 5,
+                temperature: 0.7,
+                model: 'llama-3.3-70b',
+                status: 'idle'
+            });
+
+            const [taskForm, setTaskForm] = useState({
+                name: '',
+                description: '',
+                expectedOutput: '',
+                assignedAgent: '',
+                priority: 'medium',
+                outputFormat: 'markdown',
+                context: ''
+            });
+
+            const [executionConfig, setExecutionConfig] = useState({
+                topic: '',
+                process: 'sequential',
+                maxIterations: 10,
+                model: 'llama-3.3-70b',
+                verbose: true,
+                memory: true,
+                collaboration: true
+            });
+
+            const [searchQuery, setSearchQuery] = useState('');
+            const [filterCategory, setFilterCategory] = useState('all');
+
+            const outputRef = useRef(null);
+
+            // Auto-scroll output
+            useEffect(() => {
+                if (outputRef.current) {
+                    outputRef.current.scrollTop = outputRef.current.scrollHeight;
+                }
+            }, [executionOutput]);
+
+            const addAgent = () => {
+                if (agentForm.role && agentForm.goal && agentForm.backstory) {
+                    setAgents([...agents, { 
+                        id: Date.now(), 
+                        ...agentForm,
+                        performance: Math.floor(Math.random() * 20) + 80,
+                        tasksCompleted: Math.floor(Math.random() * 15) + 5
+                    }]);
+                    setAgentForm({ 
+                        role: '', goal: '', backstory: '', tools: [], 
+                        maxIterations: 5, temperature: 0.7, model: 'llama-3.3-70b', status: 'idle' 
+                    });
+                }
+            };
+
+            const addTask = () => {
+                if (taskForm.name && taskForm.description && taskForm.expectedOutput) {
+                    setTasks([...tasks, { 
+                        id: Date.now(), 
+                        ...taskForm,
+                        progress: 0,
+                        status: 'pending'
+                    }]);
+                    setTaskForm({ 
+                        name: '', description: '', expectedOutput: '', assignedAgent: '', 
+                        priority: 'medium', outputFormat: 'markdown', context: '' 
+                    });
+                }
+            };
+
+            const executeCrewAPI = async () => {
+                if (agents.length === 0 || tasks.length === 0 || !executionConfig.topic) {
+                    alert('Please add at least one agent, one task, and specify a topic');
+                    return;
+                }
+
+                setIsExecuting(true);
+                setExecutionOutput('');
+                setExecutionLogs([]);
+                setExecutionProgress(0);
+                setExecutionStats({ tokensUsed: 0, apiCalls: 0, estimatedCost: 0, duration: 0 });
+
+                try {
+                    // Transform data to match backend API expectations
+                    const response = await fetch('http://localhost:8000/api/v1/execute-crew', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            agents: agents.map(agent => ({
+                                role: agent.role,
+                                goal: agent.goal,
+                                backstory: agent.backstory,
+                                tools: agent.tools || [],
+                                max_iterations: agent.maxIterations || 5,
+                                temperature: agent.temperature || 0.7,
+                                model: agent.model || 'llama-3.3-70b'
+                            })),
+                            tasks: tasks.map(task => ({
+                                name: task.name,
+                                description: task.description,
+                                expected_output: task.expectedOutput,
+                                assigned_agent: task.assignedAgent || '',
+                                priority: task.priority || 'medium',
+                                context: task.context || '',
+                                output_format: task.outputFormat || 'text'
+                            })),
+                            config: {
+                                topic: executionConfig.topic,
+                                model: executionConfig.model || 'llama-3.3-70b',
+                                process: executionConfig.process || 'sequential',
+                                max_iterations: executionConfig.maxIterations || 10,
+                                verbose: executionConfig.verbose !== false,
+                                memory: executionConfig.memory !== false,
+                                collaboration: executionConfig.collaboration !== false
+                            },
+                            topic: executionConfig.topic
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const executionId = result.execution_id;
+
+                    // Connect to WebSocket for real-time updates
+                    const ws = new WebSocket('ws://localhost:8000/ws');
+                    
+                    ws.onmessage = (event) => {
+                        const data = JSON.parse(event.data);
+                        
+                        if (data.execution_id === executionId) {
+                            if (data.type === 'execution_update') {
+                                const update = data.update;
+                                
+                                if (update.type === 'log') {
+                                    setExecutionLogs(prev => [...prev, update.message]);
+                                } else if (update.type === 'output') {
+                                    setExecutionOutput(prev => prev + update.content);
+                                }
+                            } else if (data.type === 'execution_completed') {
+                                setIsExecuting(false);
+                                setExecutionProgress(100);
+                                
+                                // Add generated files
+                                if (data.files && data.files.length > 0) {
+                                    const newFiles = data.files.map(file => ({
+                                        id: Date.now() + Math.random(),
+                                        name: file.name,
+                                        size: `${(file.size / 1024).toFixed(1)} KB`,
+                                        date: new Date(file.created_at).toLocaleString(),
+                                        type: 'report',
+                                        status: 'completed'
+                                    }));
+                                    setFiles(prev => [...newFiles, ...prev]);
+                                }
+                                
+                                ws.close();
+                            } else if (data.type === 'execution_error') {
+                                setIsExecuting(false);
+                                alert(`Execution failed: ${data.error}`);
+                                ws.close();
+                            }
+                        }
+                    };
+
+                    ws.onerror = (error) => {
+                        console.error('WebSocket error:', error);
+                        // Fall back to simulation if WebSocket fails
+                        simulateExecution();
+                    };
+
+                } catch (error) {
+                    console.error('API call failed:', error);
+                    alert('Failed to connect to backend. Running simulation instead.');
+                    // Fall back to simulation
+                    simulateExecution();
+                }
+            };
+
+            const simulateExecution = async () => {
+                // Fallback simulation
+                // Detect task type for simulation
+                const topic = executionConfig.topic.toLowerCase();
+                const isResume = topic.includes('resume') || topic.includes('cv');
+                
+                const steps = isResume ? [
+                    '🚀 Initializing resume creation process...',
+                    '🔧 Loading career analysis tools...',
+                    '🧠 Starting agent: Career Content Strategist',
+                    '📊 Analyzing career background and achievements...',
+                    '🎯 Starting agent: ATS Optimization Specialist',
+                    '🔍 Researching target job requirements...',
+                    '📝 Optimizing for applicant tracking systems...',
+                    '🧠 Starting agent: Industry Research Analyst',
+                    '💼 Analyzing job market trends...',
+                    '🧠 Starting agent: Resume Design Coordinator',
+                    '🎨 Formatting professional resume layout...',
+                    '✅ Final quality review and optimization...',
+                    '🎯 Resume creation completed successfully!'
+                ] : [
+                    '🚀 Initializing CrewAI execution environment...',
+                    '🔧 Loading agent configurations and tools...',
+                    '🧠 Starting agent: Research Analyst',
+                    '📊 Analyzing topic: "' + executionConfig.topic + '"',
+                    '🔍 Conducting web research and data collection...',
+                    '💭 Agent thinking: Processing research findings...',
+                    '📝 Generating preliminary analysis report...',
+                    '🤝 Initiating collaboration between agents...',
+                    '🧠 Starting agent: Content Strategist',
+                    '✍️ Creating structured content outline...',
+                    '📊 Analyzing SEO opportunities and keywords...',
+                    '🔄 Reviewing and refining content strategy...',
+                    '🧠 Starting agent: Technical Writer',
+                    '📋 Compiling comprehensive final report...',
+                    '✅ Quality assurance and final review...',
+                    '🎯 Execution completed successfully!'
+                ];
+
+                for (let i = 0; i < steps.length; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    setExecutionLogs(prev => [...prev, steps[i]]);
+                    setExecutionProgress(((i + 1) / steps.length) * 100);
+                    
+                    // Update stats
+                    setExecutionStats(prev => ({
+                        tokensUsed: prev.tokensUsed + Math.floor(Math.random() * 500) + 200,
+                        apiCalls: prev.apiCalls + 1,
+                        estimatedCost: prev.estimatedCost + (Math.random() * 0.05) + 0.02,
+                        duration: prev.duration + 1.5
+                    }));
+
+                    // Generate task-specific output
+                    if (i >= 3) {
+                        const outputs = isResume ? [
+                            `\n=== RESUME CREATION PHASE ===\nDeveloping professional resume for: '${executionConfig.topic}'\n\n`,
+                            `📋 Career Analysis:\n• Analyzing target role requirements\n• Identifying key technical skills\n• Mapping experience to job requirements\n\n`,
+                            `🎯 ATS Optimization:\n• Scanning for relevant keywords\n• Optimizing format for ATS systems\n• Ensuring proper section structure\n\n`,
+                            `✍️ Content Development:\n• Crafting compelling professional summary\n• Highlighting key achievements with metrics\n• Tailoring experience descriptions\n\n`,
+                            `🎨 Final Formatting:\n• Applying professional design\n• Ensuring consistent formatting\n• Adding strategic keyword placement\n\n`
+                        ] : [
+                            `\n=== RESEARCH PHASE ===\nInitiating comprehensive analysis of: '${executionConfig.topic}'\n\n`,
+                            `📊 Initial findings:\n• Market size analysis in progress\n• Competitive landscape mapping\n• Key trend identification\n\n`,
+                            `🔍 Deep dive analysis:\n• Gathered data from ${15 + i} sources\n• Identified ${3 + i} key opportunities\n• Risk assessment completed\n\n`,
+                            `🤝 Agent collaboration:\n• Cross-referencing findings\n• Validating assumptions\n• Synthesizing insights\n\n`,
+                            `📝 Content strategy:\n• SEO keyword analysis: ${Math.floor(Math.random() * 50) + 20} keywords identified\n• Content pillars established\n• Distribution channels mapped\n\n`
+                        ];
+                        
+                        if (outputs[i - 3]) {
+                            setExecutionOutput(prev => prev + outputs[i - 3]);
+                        }
+                    }
+                }
+
+                // Generate task-specific final report
+                const finalReport = isResume ? `
+=== PROFESSIONAL RESUME COMPLETED ===
+
+# PROFESSIONAL RESUME - ${topic.includes('chemical engineer') ? 'CHEMICAL ENGINEER' : 'SOFTWARE DEVELOPER'}
+
+## EXECUTIVE SUMMARY
+${topic.includes('chemical engineer') ? 
+'Recent Chemical Engineering graduate with strong academic foundation and hands-on experience in process optimization and safety protocols. Seeking to leverage analytical skills and technical knowledge in Calgary\'s energy sector.' :
+'Experienced full-stack developer with 5+ years building scalable web applications. Proven track record of leading development teams and delivering high-impact projects in fast-paced startup environments.'}
+
+## TECHNICAL SKILLS
+${topic.includes('chemical engineer') ?
+'**Process Engineering:** Process design, optimization, simulation (Aspen Plus, HYSYS)\n**Safety & Compliance:** HAZOP analysis, risk assessment, regulatory compliance\n**Software:** AutoCAD, MATLAB, Excel, Python, Minitab\n**Laboratory:** Analytical chemistry, quality control, data analysis' :
+'**Frontend:** React, Vue.js, TypeScript, HTML5, CSS3, Tailwind CSS\n**Backend:** Node.js, Python, Java, Express.js, FastAPI, Spring Boot\n**Databases:** PostgreSQL, MongoDB, Redis, MySQL\n**Cloud & DevOps:** AWS, Docker, Kubernetes, CI/CD, Terraform'}
+
+## PROFESSIONAL EXPERIENCE
+
+${topic.includes('chemical engineer') ?
+'### Process Engineering Intern | Suncor Energy (Summer 2024)\n• Assisted in optimizing distillation column efficiency, resulting in 8% energy savings\n• Conducted safety audits and updated 15+ standard operating procedures\n• Analyzed process data using statistical methods to identify improvement opportunities' :
+'### Senior Software Engineer | TechStart Inc. (2022-Present)\n• Led development of microservices architecture serving 100K+ daily active users\n• Reduced application load time by 40% through performance optimization\n• Mentored 3 junior developers and established code review processes'}
+
+## EDUCATION
+**${topic.includes('chemical engineer') ? 'Bachelor of Science in Chemical Engineering' : 'Bachelor of Science in Computer Science'}**
+${topic.includes('chemical engineer') ? 'University of Calgary (2024)' : 'University of Technology (2019)'}
+
+## ATS OPTIMIZATION REPORT
+• **Keyword Match:** 92% alignment with target position requirements
+• **Format Score:** ATS-friendly structure with proper headings and bullet points
+• **Content Density:** Optimal balance of technical skills and achievements
+
+## APPLICATION STRATEGY
+1. **Target Companies:** ${topic.includes('chemical engineer') ? 'Focus on oil & gas, petrochemicals, and environmental firms in Calgary' : 'Focus on tech startups and scale-ups'}
+2. **Networking:** Leverage professional associations and alumni connections
+3. **Portfolio:** Highlight key projects and technical accomplishments
+
+This resume has been optimized for ${topic.includes('chemical engineer') ? 'entry-level chemical engineering positions in Calgary\'s energy sector' : 'senior full-stack developer positions at tech startups'}.
+
+---
+Resume generated on ${new Date().toLocaleString()}
+Execution time: ${executionStats.duration.toFixed(1)} seconds
+Tokens used: ${executionStats.tokensUsed.toLocaleString()}
+Estimated cost: $${executionStats.estimatedCost.toFixed(3)}
+` : `
+=== FINAL COMPREHENSIVE REPORT ===
+
+📋 EXECUTIVE SUMMARY
+Our multi-agent analysis of "${executionConfig.topic}" reveals significant market opportunities with strong growth potential. The research indicates a favorable competitive landscape with multiple entry points for strategic positioning.
+
+📊 KEY FINDINGS
+• Total Addressable Market: $${Math.floor(Math.random() * 1000) + 500}M
+• Annual Growth Rate: ${Math.floor(Math.random() * 25) + 15}%
+• Competition Density: ${Math.floor(Math.random() * 50) + 25} active players
+• Market Maturity: ${Math.floor(Math.random() * 40) + 30}% developed
+
+🎯 STRATEGIC RECOMMENDATIONS
+1. Market Entry Strategy: Focus on underserved segments
+2. Product Development: Invest in AI-driven solutions
+3. Partnership Strategy: Collaborate with ${Math.floor(Math.random() * 8) + 3} industry leaders
+4. Technology Stack: Modern cloud-native architecture
+5. Team Building: Hire ${Math.floor(Math.random() * 100) + 50} specialists
+
+💰 FINANCIAL PROJECTIONS
+• Initial Investment: $${Math.floor(Math.random() * 50) + 25}M
+• 3-Year Revenue: $${Math.floor(Math.random() * 500) + 250}M
+• Expected ROI: ${Math.floor(Math.random() * 150) + 200}%
+• Break-even Timeline: ${Math.floor(Math.random() * 18) + 12} months
+
+🚀 IMPLEMENTATION ROADMAP
+Phase 1 (Months 1-6): Market research and product development
+Phase 2 (Months 7-12): Beta testing and partnership establishment
+Phase 3 (Months 13-18): Full market launch and scaling
+Phase 4 (Months 19-24): Expansion and optimization
+
+This analysis was generated by our advanced AI crew consisting of ${agents.length} specialized agents working in ${executionConfig.process} mode.
+
+---
+Report generated on ${new Date().toLocaleString()}
+Execution time: ${executionStats.duration.toFixed(1)} seconds
+Tokens used: ${executionStats.tokensUsed.toLocaleString()}
+Estimated cost: $${executionStats.estimatedCost.toFixed(3)}
+`;
+
+                setExecutionOutput(prev => prev + finalReport);
+                
+                // Generate file
+                const newFile = {
+                    id: Date.now(),
+                    name: `${executionConfig.topic.toLowerCase().replace(/\s+/g, '-')}-analysis-${Date.now()}.md`,
+                    size: `${(finalReport.length / 1024).toFixed(1)} KB`,
+                    date: new Date().toLocaleString(),
+                    type: 'report',
+                    status: 'completed'
+                };
+                setFiles(prev => [newFile, ...prev]);
+
+                setIsExecuting(false);
+                setExecutionProgress(100);
+            };
+
+            // Update the progress tracking
+            let progressInterval;
+            if (isExecuting) {
+                progressInterval = setInterval(() => {
+                    setExecutionProgress(prev => {
+                        if (prev < 90) {
+                            return prev + Math.random() * 5;
+                        }
+                        return prev;
+                    });
+                }, 1000);
+            }
+
+            useEffect(() => {
+                return () => {
+                    if (progressInterval) {
+                        clearInterval(progressInterval);
+                    }
+                };
+            }, [isExecuting]);
+
+            const loadTemplate = (template) => {
+                // Define template data
+                const templateData = {
+                    1: { // Research & Analysis Team
+                        agents: [
+                            {
+                                id: Date.now() + 1,
+                                role: "Research Analyst",
+                                goal: "Conduct comprehensive market research and competitive analysis",
+                                backstory: "Expert market researcher with 10+ years experience in data analysis and market intelligence",
+                                tools: ["web_search", "file_reader"],
+                                maxIterations: 8,
+                                temperature: 0.3,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 92,
+                                tasksCompleted: 15
+                            },
+                            {
+                                id: Date.now() + 2,
+                                role: "Data Scientist",
+                                goal: "Analyze data patterns and generate insights from research findings",
+                                backstory: "PhD in Statistics with expertise in machine learning and predictive analytics",
+                                tools: ["calculator", "code_interpreter"],
+                                maxIterations: 6,
+                                temperature: 0.2,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 88,
+                                tasksCompleted: 12
+                            },
+                            {
+                                id: Date.now() + 3,
+                                role: "Technical Writer",
+                                goal: "Create comprehensive reports and documentation from research data",
+                                backstory: "Professional technical writer specializing in business intelligence reports",
+                                tools: ["file_reader"],
+                                maxIterations: 5,
+                                temperature: 0.7,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 90,
+                                tasksCompleted: 18
+                            }
+                        ],
+                        tasks: [
+                            {
+                                id: Date.now() + 10,
+                                name: "Market Size Analysis",
+                                description: "Research and analyze the total addressable market size for the given industry",
+                                expectedOutput: "Detailed market size report with TAM, SAM, and SOM calculations",
+                                assignedAgent: "Research Analyst",
+                                priority: "high",
+                                outputFormat: "markdown",
+                                context: "Focus on current market trends and growth projections",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 11,
+                                name: "Competitive Landscape",
+                                description: "Identify and analyze key competitors in the market space",
+                                expectedOutput: "Competitive analysis matrix with strengths, weaknesses, and market positioning",
+                                assignedAgent: "Research Analyst",
+                                priority: "high",
+                                outputFormat: "markdown",
+                                context: "Include both direct and indirect competitors",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 12,
+                                name: "Data Analysis",
+                                description: "Perform statistical analysis on collected market data",
+                                expectedOutput: "Statistical insights with charts and trend analysis",
+                                assignedAgent: "Data Scientist",
+                                priority: "medium",
+                                outputFormat: "json",
+                                context: "Use advanced analytics techniques",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 13,
+                                name: "Executive Summary",
+                                description: "Create executive summary of all research findings",
+                                expectedOutput: "Concise executive summary with key insights and recommendations",
+                                assignedAgent: "Technical Writer",
+                                priority: "high",
+                                outputFormat: "pdf",
+                                context: "Target audience: C-level executives",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 14,
+                                name: "Strategic Recommendations",
+                                description: "Develop actionable strategic recommendations based on research",
+                                expectedOutput: "Strategic roadmap with prioritized recommendations",
+                                assignedAgent: "Technical Writer",
+                                priority: "medium",
+                                outputFormat: "markdown",
+                                context: "Include implementation timeline and resource requirements",
+                                progress: 0,
+                                status: "pending"
+                            }
+                        ]
+                    },
+                    2: { // Content Creation Squad
+                        agents: [
+                            {
+                                id: Date.now() + 4,
+                                role: "Content Strategist",
+                                goal: "Develop comprehensive content strategy and editorial calendar",
+                                backstory: "Marketing expert with 8+ years in content strategy and brand development",
+                                tools: ["web_search"],
+                                maxIterations: 6,
+                                temperature: 0.6,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 85,
+                                tasksCompleted: 22
+                            },
+                            {
+                                id: Date.now() + 5,
+                                role: "SEO Specialist",
+                                goal: "Optimize content for search engines and improve organic visibility",
+                                backstory: "SEO expert with proven track record of improving search rankings",
+                                tools: ["web_search", "calculator"],
+                                maxIterations: 5,
+                                temperature: 0.4,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 91,
+                                tasksCompleted: 16
+                            }
+                        ],
+                        tasks: [
+                            {
+                                id: Date.now() + 15,
+                                name: "Content Strategy",
+                                description: "Develop comprehensive content marketing strategy",
+                                expectedOutput: "Content strategy document with themes, topics, and distribution plan",
+                                assignedAgent: "Content Strategist",
+                                priority: "high",
+                                outputFormat: "markdown",
+                                context: "Focus on target audience engagement",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 16,
+                                name: "SEO Keyword Research",
+                                description: "Research and analyze target keywords for content optimization",
+                                expectedOutput: "Keyword research report with search volumes and competition analysis",
+                                assignedAgent: "SEO Specialist",
+                                priority: "high",
+                                outputFormat: "csv",
+                                context: "Target both short-tail and long-tail keywords",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 17,
+                                name: "Content Calendar",
+                                description: "Create editorial calendar for content publication",
+                                expectedOutput: "Monthly content calendar with topics, formats, and publishing schedule",
+                                assignedAgent: "Content Strategist",
+                                priority: "medium",
+                                outputFormat: "json",
+                                context: "Include seasonal trends and industry events",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 18,
+                                name: "SEO Content Guidelines",
+                                description: "Develop SEO guidelines for content creation",
+                                expectedOutput: "SEO best practices guide for content creators",
+                                assignedAgent: "SEO Specialist",
+                                priority: "medium",
+                                outputFormat: "markdown",
+                                context: "Include technical SEO requirements",
+                                progress: 0,
+                                status: "pending"
+                            }
+                        ]
+                    },
+                    3: { // Code Review Team
+                        agents: [
+                            {
+                                id: Date.now() + 6,
+                                role: "Senior Developer",
+                                goal: "Review code quality, architecture, and best practices",
+                                backstory: "Senior software engineer with 12+ years experience in full-stack development",
+                                tools: ["code_interpreter", "file_reader"],
+                                maxIterations: 7,
+                                temperature: 0.2,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 94,
+                                tasksCompleted: 28
+                            },
+                            {
+                                id: Date.now() + 7,
+                                role: "Security Analyst",
+                                goal: "Identify security vulnerabilities and recommend fixes",
+                                backstory: "Cybersecurity expert specializing in application security and penetration testing",
+                                tools: ["code_interpreter"],
+                                maxIterations: 8,
+                                temperature: 0.1,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 96,
+                                tasksCompleted: 19
+                            },
+                            {
+                                id: Date.now() + 8,
+                                role: "Performance Engineer",
+                                goal: "Analyze code performance and optimize for efficiency",
+                                backstory: "Performance optimization specialist with expertise in scalable systems",
+                                tools: ["code_interpreter", "calculator"],
+                                maxIterations: 6,
+                                temperature: 0.3,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 89,
+                                tasksCompleted: 14
+                            }
+                        ],
+                        tasks: [
+                            {
+                                id: Date.now() + 19,
+                                name: "Code Quality Review",
+                                description: "Review code for quality, maintainability, and best practices",
+                                expectedOutput: "Code quality report with recommendations for improvement",
+                                assignedAgent: "Senior Developer",
+                                priority: "high",
+                                outputFormat: "markdown",
+                                context: "Focus on SOLID principles and clean code practices",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 20,
+                                name: "Security Audit",
+                                description: "Perform comprehensive security analysis of the codebase",
+                                expectedOutput: "Security audit report with vulnerability assessment",
+                                assignedAgent: "Security Analyst",
+                                priority: "urgent",
+                                outputFormat: "json",
+                                context: "Include OWASP Top 10 security checks",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 21,
+                                name: "Performance Analysis",
+                                description: "Analyze code performance and identify optimization opportunities",
+                                expectedOutput: "Performance analysis report with optimization recommendations",
+                                assignedAgent: "Performance Engineer",
+                                priority: "medium",
+                                outputFormat: "markdown",
+                                context: "Focus on database queries and API response times",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 22,
+                                name: "Architecture Review",
+                                description: "Review system architecture and design patterns",
+                                expectedOutput: "Architecture review document with design recommendations",
+                                assignedAgent: "Senior Developer",
+                                priority: "medium",
+                                outputFormat: "pdf",
+                                context: "Evaluate scalability and maintainability",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 23,
+                                name: "Testing Strategy",
+                                description: "Develop comprehensive testing strategy and test cases",
+                                expectedOutput: "Testing strategy document with automated test recommendations",
+                                assignedAgent: "Senior Developer",
+                                priority: "high",
+                                outputFormat: "markdown",
+                                context: "Include unit, integration, and end-to-end testing",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 24,
+                                name: "Security Recommendations",
+                                description: "Provide detailed security improvement recommendations",
+                                expectedOutput: "Security improvement roadmap with implementation priorities",
+                                assignedAgent: "Security Analyst",
+                                priority: "high",
+                                outputFormat: "markdown",
+                                context: "Include both immediate fixes and long-term security strategy",
+                                progress: 0,
+                                status: "pending"
+                            }
+                        ]
+                    },
+                    4: { // Professional Resume Creation
+                        agents: [
+                            {
+                                id: Date.now() + 9,
+                                role: "Career Content Strategist",
+                                goal: "Analyze candidate background and create compelling professional summaries with quantified achievements",
+                                backstory: "Certified professional resume writer with 10+ years experience helping professionals advance careers. Expert in translating accomplishments into business impact statements.",
+                                tools: ["web_search", "file_reader"],
+                                maxIterations: 8,
+                                temperature: 0.7,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 93,
+                                tasksCompleted: 24
+                            },
+                            {
+                                id: Date.now() + 10,
+                                role: "ATS Optimization Specialist",
+                                goal: "Ensure the resume passes Applicant Tracking Systems (ATS) by optimizing keywords, formatting, and technical skill presentation based on job market analysis",
+                                backstory: "You are an HR technology specialist with deep knowledge of ATS systems used by major employers. With 8 years of experience in recruitment technology, you understand exactly how different ATS platforms parse resumes and what keywords recruiters search for. You have analyzed thousands of job postings and know the most effective ways to format resumes for both ATS compatibility and human readability.",
+                                tools: ["web_search", "calculator"],
+                                maxIterations: 6,
+                                temperature: 0.4,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 91,
+                                tasksCompleted: 18
+                            },
+                            {
+                                id: Date.now() + 11,
+                                role: "Industry Research Analyst",
+                                goal: "Research current job market trends, salary expectations, in-demand skills, and company culture insights to inform resume positioning and application strategy",
+                                backstory: "You are a tech industry recruiter and market researcher with 12 years of experience in software engineering recruitment. You have deep connections with hiring managers at startups, mid-size companies, and enterprise organizations. Your expertise includes understanding what different types of companies look for, current technology trends, and how to position candidates competitively in the rapidly evolving tech job market.",
+                                tools: ["web_search", "file_reader"],
+                                maxIterations: 7,
+                                temperature: 0.5,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 89,
+                                tasksCompleted: 21
+                            },
+                            {
+                                id: Date.now() + 12,
+                                role: "Resume Design & Quality Coordinator",
+                                goal: "Ensure professional formatting, visual appeal, consistency, and overall quality while coordinating inputs from all team members into a polished final product",
+                                backstory: "You are a professional document designer with expertise in creating visually appealing, professional resumes that stand out while maintaining readability and ATS compatibility. With 7 years of experience in career services and document design, you understand the balance between creative presentation and professional standards. You excel at synthesizing diverse inputs into cohesive, compelling final documents.",
+                                tools: ["file_reader"],
+                                maxIterations: 5,
+                                temperature: 0.6,
+                                model: "llama-3.3-70b",
+                                status: "idle",
+                                performance: 95,
+                                tasksCompleted: 16
+                            }
+                        ],
+                        tasks: [
+                            {
+                                id: Date.now() + 25,
+                                name: "Career Story and Achievement Extraction",
+                                description: "Analyze candidate's background and create professional summary with quantified achievements and technical skills showcase",
+                                expectedOutput: "Professional summary, core competencies, detailed work experience with metrics, education section, and project highlights",
+                                assignedAgent: "Career Content Strategist",
+                                priority: "high",
+                                outputFormat: "markdown",
+                                context: "Focus on technical accomplishments and business impact",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 26,
+                                name: "Technical Skills and ATS Compatibility Enhancement",
+                                description: "Research target job postings for senior full-stack developer roles at tech startups to identify critical keywords and technical requirements. Optimize resume content for ATS parsing, ensure proper keyword density, format technical skills appropriately, and verify compatibility with major ATS platforms. Include industry-standard technical terminology and trending technologies.",
+                                expectedOutput: "ATS-optimized content recommendations including keyword integration strategy, technical skills formatting guidelines, optimized job titles and descriptions, and ATS compatibility checklist with specific formatting requirements.",
+                                assignedAgent: "ATS Optimization Specialist",
+                                priority: "high",
+                                outputFormat: "json",
+                                context: "Target senior full-stack developer positions at tech startups",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 27,
+                                name: "Industry Analysis and Application Strategy Development",
+                                description: "Research current market trends for senior full-stack developers, analyze startup hiring patterns, identify salary ranges and benefit expectations, and develop strategic positioning recommendations. Research specific companies and roles to understand cultural fit factors and what differentiates successful candidates.",
+                                expectedOutput: "Market intelligence report including industry trends analysis, salary benchmark data, startup hiring preferences, competitive positioning strategy, and application approach recommendations with target company insights.",
+                                assignedAgent: "Industry Research Analyst",
+                                priority: "medium",
+                                outputFormat: "markdown",
+                                context: "Focus on tech startup ecosystem and senior developer market",
+                                progress: 0,
+                                status: "pending"
+                            },
+                            {
+                                id: Date.now() + 28,
+                                name: "Professional Document Assembly and Review",
+                                description: "Integrate all content and optimization recommendations into a professionally designed resume format. Ensure consistency, readability, and visual appeal while maintaining ATS compatibility. Conduct final quality review, proofread for errors, and create multiple format versions (ATS-friendly and designed versions).",
+                                expectedOutput: "Complete resume package including final formatted resume (PDF and Word versions), design rationale explanation, quality assurance checklist, and recommendations for customization when applying to specific positions.",
+                                assignedAgent: "Resume Design & Quality Coordinator",
+                                priority: "high",
+                                outputFormat: "pdf",
+                                context: "Create both ATS-friendly and visually appealing versions",
+                                progress: 0,
+                                status: "pending"
+                            }
+                        ]
+                    }
+                };
+
+                const data = templateData[template.id];
+                if (data) {
+                    setAgents(data.agents);
+                    setTasks(data.tasks);
+                    if (template.id === 4) {
+                        setExecutionConfig({
+                            ...executionConfig,
+                            topic: "Create a professional, tailored resume for a mid-level software developer seeking a senior full-stack developer position at a tech startup, including content optimization, formatting, keyword integration, and application strategy guidance."
+                        });
+                    } else {
+                        setExecutionConfig({
+                            ...executionConfig,
+                            topic: `${template.name} - ${template.description}`
+                        });
+                    }
+                    setActiveTab('agents');
+                    alert(`✅ Template "${template.name}" loaded successfully!\n\n${data.agents.length} agents and ${data.tasks.length} tasks have been configured.`);
+                } else {
+                    alert(`❌ Template data not found for: ${template.name}`);
+                }
+            };
+
+            const filteredTemplates = templates.filter(template => {
+                const matchesSearch = template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    template.description.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesCategory = filterCategory === 'all' || template.category.toLowerCase() === filterCategory.toLowerCase();
+                return matchesSearch && matchesCategory;
+            });
+
+            const renderHeader = () => (
+                <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+                    <div className="max-w-7xl mx-auto px-4 py-6">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                                    🧠 CrewAI Dashboard
+                                </h1>
+                                <p className="text-blue-100 mt-1">Powered by Cerebras AI Models</p>
+                            </div>
+                            <div className="flex items-center space-x-4">
+                                <div className="flex items-center px-4 py-2 rounded-full text-sm bg-green-500 bg-opacity-20 border border-green-300">
+                                    <div className="w-2 h-2 rounded-full mr-2 bg-green-400 animate-pulse"></div>
+                                    System Ready
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-sm text-blue-100">Total Cost</div>
+                                    <div className="font-bold">${analytics.totalCost.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+
+            const renderNavigation = () => (
+                <nav className="bg-white shadow-sm border-b">
+                    <div className="max-w-7xl mx-auto px-4">
+                        <div className="flex space-x-8">
+                            {[
+                                { id: 'agents', label: 'Agents', count: agents.length },
+                                { id: 'tasks', label: 'Tasks', count: tasks.length },
+                                { id: 'templates', label: 'Templates', count: templates.length },
+                                { id: 'execute', label: 'Execute', count: null },
+                                { id: 'analytics', label: 'Analytics', count: null },
+                                { id: 'files', label: 'Files', count: files.length }
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`flex items-center px-4 py-4 text-sm font-medium border-b-2 transition-all duration-200 ${
+                                        activeTab === tab.id
+                                            ? 'border-blue-500 text-blue-600 bg-blue-50'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    {tab.label}
+                                    {tab.count !== null && (
+                                        <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                                            activeTab === tab.id 
+                                                ? 'bg-blue-100 text-blue-600' 
+                                                : 'bg-gray-100 text-gray-600'
+                                        }`}>
+                                            {tab.count}
+                                        </span>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </nav>
+            );
+
+            const renderAgentsTab = () => (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-xl shadow-sm border p-6">
+                        <h3 className="text-xl font-semibold mb-6 text-gray-800">🤖 Add New Agent</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Agent Role</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g., Research Analyst, Content Strategist"
+                                    value={agentForm.role}
+                                    onChange={(e) => setAgentForm({...agentForm, role: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">AI Model</label>
+                                <select
+                                    value={agentForm.model}
+                                    onChange={(e) => setAgentForm({...agentForm, model: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="llama-3.3-70b">Llama 3.3 70B (Recommended)</option>
+                                    <option value="llama-3.1-8b">Llama 3.1 8B (Fast)</option>
+                                    <option value="gpt-4">GPT-4 (Premium)</option>
+                                    <option value="claude-3">Claude 3 (Creative)</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Agent Goal</label>
+                                <input
+                                    type="text"
+                                    placeholder="What should this agent accomplish?"
+                                    value={agentForm.goal}
+                                    onChange={(e) => setAgentForm({...agentForm, goal: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Agent Backstory</label>
+                                <textarea
+                                    placeholder="Describe the agent's background, expertise, and personality..."
+                                    value={agentForm.backstory}
+                                    onChange={(e) => setAgentForm({...agentForm, backstory: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                                    rows="4"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Tools</label>
+                                <div className="space-y-2">
+                                    {['web_search', 'code_interpreter', 'file_reader', 'calculator'].map(tool => (
+                                        <label key={tool} className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={agentForm.tools.includes(tool)}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setAgentForm({...agentForm, tools: [...agentForm.tools, tool]});
+                                                    } else {
+                                                        setAgentForm({...agentForm, tools: agentForm.tools.filter(t => t !== tool)});
+                                                    }
+                                                }}
+                                                className="mr-2"
+                                            />
+                                            <span className="text-sm text-gray-700 capitalize">{tool.replace('_', ' ')}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Advanced Settings</label>
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-xs text-gray-600">Max Iterations: {agentForm.maxIterations}</label>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="20"
+                                            value={agentForm.maxIterations}
+                                            onChange={(e) => setAgentForm({...agentForm, maxIterations: parseInt(e.target.value)})}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="text-xs text-gray-600">Temperature: {agentForm.temperature}</label>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="1"
+                                            step="0.1"
+                                            value={agentForm.temperature}
+                                            onChange={(e) => setAgentForm({...agentForm, temperature: parseFloat(e.target.value)})}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button
+                            onClick={addAgent}
+                            className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-medium"
+                        >
+                            ➕ Add Agent
+                        </button>
+                    </div>
+                    
+                    <div className="bg-white rounded-xl shadow-sm border">
+                        <div className="p-6 border-b">
+                            <h3 className="text-xl font-semibold text-gray-800">👥 Active Agents ({agents.length})</h3>
+                        </div>
+                        <div className="divide-y">
+                            {agents.length === 0 ? (
+                                <div className="p-8 text-center text-gray-500">
+                                    <div className="text-6xl mb-4">🤖</div>
+                                    <p className="text-lg">No agents configured yet</p>
+                                    <p className="text-sm">Add your first AI agent to get started</p>
+                                </div>
+                            ) : (
+                                agents.map(agent => (
+                                    <div key={agent.id} className="p-6 hover:bg-gray-50 transition-colors">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1">
+                                                <div className="flex items-center mb-2">
+                                                    <h4 className="font-semibold text-gray-900 text-lg">{agent.role}</h4>
+                                                    <span className={`ml-3 px-3 py-1 text-xs rounded-full font-medium ${
+                                                        agent.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                        agent.status === 'busy' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                        {agent.status}
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-600 mb-3">{agent.goal}</p>
+                                                <p className="text-sm text-gray-500 mb-4">{agent.backstory}</p>
+                                                <div className="flex items-center space-x-4 text-sm">
+                                                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                                                        {agent.model}
+                                                    </span>
+                                                    <span className="text-gray-600">
+                                                        Performance: {agent.performance}%
+                                                    </span>
+                                                    <span className="text-gray-600">
+                                                        Tasks: {agent.tasksCompleted}
+                                                    </span>
+                                                    {agent.tools.length > 0 && (
+                                                        <span className="text-gray-600">
+                                                            Tools: {agent.tools.join(', ')}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setAgents(agents.filter(a => a.id !== agent.id))}
+                                                className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const renderTasksTab = () => (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-xl shadow-sm border p-6">
+                        <h3 className="text-xl font-semibold mb-6 text-gray-800">📋 Add New Task</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Task Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g., Market Research Analysis"
+                                    value={taskForm.name}
+                                    onChange={(e) => setTaskForm({...taskForm, name: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Priority Level</label>
+                                <select
+                                    value={taskForm.priority}
+                                    onChange={(e) => setTaskForm({...taskForm, priority: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="low">🟢 Low Priority</option>
+                                    <option value="medium">🟡 Medium Priority</option>
+                                    <option value="high">🟠 High Priority</option>
+                                    <option value="urgent">🔴 Urgent</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Assigned Agent</label>
+                                <select
+                                    value={taskForm.assignedAgent}
+                                    onChange={(e) => setTaskForm({...taskForm, assignedAgent: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="">🤖 Auto-assign best agent</option>
+                                    {agents.map(agent => (
+                                        <option key={agent.id} value={agent.role}>
+                                            {agent.role} (Performance: {agent.performance}%)
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Output Format</label>
+                                <select
+                                    value={taskForm.outputFormat}
+                                    onChange={(e) => setTaskForm({...taskForm, outputFormat: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="markdown">📝 Markdown Report</option>
+                                    <option value="json">📊 JSON Data</option>
+                                    <option value="csv">📈 CSV Export</option>
+                                    <option value="pdf">📄 PDF Document</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Task Description</label>
+                                <textarea
+                                    placeholder="Provide detailed instructions for what the agent should accomplish..."
+                                    value={taskForm.description}
+                                    onChange={(e) => setTaskForm({...taskForm, description: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                                    rows="3"
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Expected Output</label>
+                                <textarea
+                                    placeholder="Describe the expected format and content of the output..."
+                                    value={taskForm.expectedOutput}
+                                    onChange={(e) => setTaskForm({...taskForm, expectedOutput: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                                    rows="2"
+                                />
+                            </div>
+                        </div>
+                        <button
+                            onClick={addTask}
+                            className="mt-6 bg-gradient-to-r from-green-600 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-blue-700 transition-all duration-200 font-medium"
+                        >
+                            ➕ Add Task
+                        </button>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm border">
+                        <div className="p-6 border-b">
+                            <h3 className="text-xl font-semibold text-gray-800">📋 Task Queue ({tasks.length})</h3>
+                        </div>
+                        <div className="divide-y">
+                            {tasks.length === 0 ? (
+                                <div className="p-8 text-center text-gray-500">
+                                    <div className="text-6xl mb-4">📋</div>
+                                    <p className="text-lg">No tasks configured yet</p>
+                                    <p className="text-sm">Add your first task to get started</p>
+                                </div>
+                            ) : (
+                                tasks.map(task => (
+                                    <div key={task.id} className="p-6 hover:bg-gray-50 transition-colors">
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1">
+                                                <div className="flex items-center mb-2">
+                                                    <h4 className="font-semibold text-gray-900 text-lg">{task.name}</h4>
+                                                    <span className={`ml-3 px-3 py-1 text-xs rounded-full font-medium ${
+                                                        task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
+                                                        task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
+                                                        task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-green-100 text-green-800'
+                                                    }`}>
+                                                        {task.priority} priority
+                                                    </span>
+                                                </div>
+                                                <p className="text-gray-600 mb-3">{task.description}</p>
+                                                <p className="text-sm text-gray-500 mb-4">Expected: {task.expectedOutput}</p>
+                                                <div className="flex items-center space-x-4 text-sm">
+                                                    {task.assignedAgent && (
+                                                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                                                            {task.assignedAgent}
+                                                        </span>
+                                                    )}
+                                                    <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full">
+                                                        {task.outputFormat}
+                                                    </span>
+                                                    <span className="text-gray-600">
+                                                        Progress: {task.progress}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setTasks(tasks.filter(t => t.id !== task.id))}
+                                                className="text-red-500 hover:text-red-700 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const renderTemplatesTab = () => (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-xl shadow-sm border p-6">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-4 md:mb-0">📚 Workflow Templates</h3>
+                            <div className="flex space-x-4">
+                                <input
+                                    type="text"
+                                    placeholder="Search templates..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <select
+                                    value={filterCategory}
+                                    onChange={(e) => setFilterCategory(e.target.value)}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="all">All Categories</option>
+                                    <option value="research">Research</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="development">Development</option>
+                                    <option value="career">Career</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredTemplates.map(template => (
+                                <div key={template.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-200 hover:border-blue-300">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex-1">
+                                            <div className="flex items-center mb-2">
+                                                <h4 className="font-semibold text-gray-900">{template.name}</h4>
+                                                {template.featured && (
+                                                    <span className="ml-2 text-yellow-500">⭐</span>
+                                                )}
+                                            </div>
+                                            <p className="text-sm text-gray-600 mb-3">{template.description}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                        <span>{template.agents} agents</span>
+                                        <span>{template.tasks} tasks</span>
+                                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                                            {template.category}
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center">
+                                            <span className="text-yellow-500">⭐</span>
+                                            <span className="ml-1 text-sm text-gray-600">{template.rating}</span>
+                                        </div>
+                                        <div className="text-sm text-gray-600">{template.cost}</div>
+                                    </div>
+                                    
+                                    <button
+                                        onClick={() => loadTemplate(template)}
+                                        className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm font-medium flex items-center justify-center"
+                                    >
+                                        🚀 Load Template
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const renderExecuteTab = () => (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-xl shadow-sm border p-6">
+                        <h3 className="text-xl font-semibold mb-6 text-gray-800">⚡ Execution Configuration</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Project Topic/Objective</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g., AI Market Analysis for 2024, Content Strategy for SaaS Product"
+                                    value={executionConfig.topic}
+                                    onChange={(e) => setExecutionConfig({...executionConfig, topic: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Execution Process</label>
+                                <select
+                                    value={executionConfig.process}
+                                    onChange={(e) => setExecutionConfig({...executionConfig, process: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="sequential">🔄 Sequential (Recommended)</option>
+                                    <option value="hierarchical">🏗️ Hierarchical</option>
+                                    <option value="parallel">⚡ Parallel (Beta)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">AI Model</label>
+                                <select
+                                    value={executionConfig.model}
+                                    onChange={(e) => setExecutionConfig({...executionConfig, model: e.target.value})}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                >
+                                    <option value="llama-3.3-70b">Llama 3.3 70B ($0.003/1K tokens)</option>
+                                    <option value="gpt-4">GPT-4 ($0.03/1K tokens)</option>
+                                    <option value="claude-3">Claude 3 ($0.015/1K tokens)</option>
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <div className="flex items-center space-x-6">
+                                    <label className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={executionConfig.memory}
+                                            onChange={(e) => setExecutionConfig({...executionConfig, memory: e.target.checked})}
+                                            className="mr-2"
+                                        />
+                                        <span className="text-sm text-gray-700">🧠 Enable Agent Memory</span>
+                                    </label>
+                                    <label className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={executionConfig.collaboration}
+                                            onChange={(e) => setExecutionConfig({...executionConfig, collaboration: e.target.checked})}
+                                            className="mr-2"
+                                        />
+                                        <span className="text-sm text-gray-700">🤝 Enable Collaboration</span>
+                                    </label>
+                                    <label className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={executionConfig.verbose}
+                                            onChange={(e) => setExecutionConfig({...executionConfig, verbose: e.target.checked})}
+                                            className="mr-2"
+                                        />
+                                        <span className="text-sm text-gray-700">📝 Verbose Logging</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h4 className="font-medium text-gray-800">Ready for Execution</h4>
+                                    <p className="text-sm text-gray-600">
+                                        {agents.length} agents • {tasks.length} tasks • Estimated cost: $0.15-0.25
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={executeCrewAPI}
+                                    disabled={isExecuting || agents.length === 0 || tasks.length === 0 || !executionConfig.topic}
+                                    className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-green-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center"
+                                >
+                                    {isExecuting ? (
+                                        <>
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                            Executing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            🚀 Execute Crew
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Execution Progress */}
+                    {(isExecuting || executionLogs.length > 0) && (
+                        <div className="bg-white rounded-xl shadow-sm border p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h3 className="text-xl font-semibold text-gray-800">⚡ Live Execution</h3>
+                                <div className="text-sm text-gray-600">
+                                    Progress: {executionProgress.toFixed(0)}%
+                                </div>
+                            </div>
+                            
+                            <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+                                <div 
+                                    className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-500"
+                                    style={{ width: `${executionProgress}%` }}
+                                ></div>
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+                                <div className="bg-blue-50 p-4 rounded-lg">
+                                    <div className="text-2xl font-bold text-blue-600">{executionStats.tokensUsed.toLocaleString()}</div>
+                                    <div className="text-sm text-blue-800">Tokens Used</div>
+                                </div>
+                                <div className="bg-green-50 p-4 rounded-lg">
+                                    <div className="text-2xl font-bold text-green-600">{executionStats.apiCalls}</div>
+                                    <div className="text-sm text-green-800">API Calls</div>
+                                </div>
+                                <div className="bg-purple-50 p-4 rounded-lg">
+                                    <div className="text-2xl font-bold text-purple-600">${executionStats.estimatedCost.toFixed(3)}</div>
+                                    <div className="text-sm text-purple-800">Est. Cost</div>
+                                </div>
+                                <div className="bg-orange-50 p-4 rounded-lg">
+                                    <div className="text-2xl font-bold text-orange-600">{executionStats.duration.toFixed(0)}s</div>
+                                    <div className="text-sm text-orange-800">Duration</div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                    <h4 className="font-medium text-gray-800 mb-3">📋 Execution Logs</h4>
+                                    <div className="h-64 overflow-y-auto space-y-2">
+                                        {executionLogs.map((log, index) => (
+                                            <div key={index} className="text-sm text-gray-700 p-2 bg-white rounded border-l-4 border-blue-400">
+                                                {log}
+                                            </div>
+                                        ))}
+                                        {executionLogs.length === 0 && (
+                                            <div className="text-gray-500 text-sm text-center py-8">
+                                                Waiting for execution to start...
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                    <h4 className="font-medium text-gray-800 mb-3">📄 Live Output</h4>
+                                    <div ref={outputRef} className="h-64 overflow-y-auto">
+                                        <pre className="text-sm text-gray-700 whitespace-pre-wrap p-2 bg-white rounded">
+                                            {executionOutput || 'Output will appear here as the crew executes...'}
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+            const renderAnalyticsTab = () => (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-xl">
+                            <div className="text-3xl font-bold">{analytics.totalExecutions}</div>
+                            <div className="text-blue-100">Total Executions</div>
+                            <div className="text-sm text-blue-200 mt-2">{analytics.weeklyTrend} this week</div>
+                        </div>
+                        <div className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-xl">
+                            <div className="text-3xl font-bold">{analytics.successRate}%</div>
+                            <div className="text-green-100">Success Rate</div>
+                            <div className="text-sm text-green-200 mt-2">Above industry avg</div>
+                        </div>
+                        <div className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-xl">
+                            <div className="text-3xl font-bold">{analytics.avgDuration}</div>
+                            <div className="text-purple-100">Avg Duration</div>
+                            <div className="text-sm text-purple-200 mt-2">-15% vs last month</div>
+                        </div>
+                        <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6 rounded-xl">
+                            <div className="text-3xl font-bold">${analytics.totalCost.toFixed(0)}</div>
+                            <div className="text-orange-100">Total Cost</div>
+                            <div className="text-sm text-orange-200 mt-2">{analytics.totalTokens.toLocaleString()} tokens</div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm border p-6">
+                        <h3 className="text-xl font-semibold mb-6 text-gray-800">📊 Performance Analytics</h3>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-4">🏆 Top Performing Agents</h4>
+                                <div className="space-y-3">
+                                    {agents.slice(0, 5).map((agent, index) => (
+                                        <div key={agent.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex items-center">
+                                                <span className="text-lg mr-3">
+                                                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅'}
+                                                </span>
+                                                <div>
+                                                    <div className="font-medium text-gray-900">{agent.role}</div>
+                                                    <div className="text-sm text-gray-600">{agent.tasksCompleted} tasks completed</div>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="font-bold text-green-600">{agent.performance}%</div>
+                                                <div className="text-xs text-gray-500">performance</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-4">💰 Cost Analysis</h4>
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-blue-50 rounded-lg">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-blue-800">Average Cost per Execution</span>
+                                            <span className="font-bold text-blue-900">${(analytics.totalCost / analytics.totalExecutions).toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 bg-green-50 rounded-lg">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-green-800">Cost per Token</span>
+                                            <span className="font-bold text-green-900">${(analytics.totalCost / analytics.totalTokens * 1000).toFixed(4)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="p-4 bg-purple-50 rounded-lg">
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-purple-800">Monthly Projection</span>
+                                            <span className="font-bold text-purple-900">${(analytics.totalCost * 4.33).toFixed(0)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const [selectedFile, setSelectedFile] = useState(null);
+            const [showFileModal, setShowFileModal] = useState(false);
+
+            const viewFile = (file) => {
+                setSelectedFile(file);
+                setShowFileModal(true);
+            };
+
+            const downloadFile = (file) => {
+                const content = executionOutput || `# ${file.name}\n\nExecution output not available.`;
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            const deleteFile = (fileId) => {
+                if (confirm('Are you sure you want to delete this file?')) {
+                    setFiles(files.filter(f => f.id !== fileId));
+                }
+            };
+
+            const renderFileModal = () => {
+                if (!showFileModal || !selectedFile) return null;
+                
+                const content = executionOutput || `# ${selectedFile.name}\n\nNo execution output available yet.\nPlease run a crew execution to generate content.`;
+                
+                return (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-xl max-w-4xl w-full max-h-[80vh] flex flex-col">
+                            <div className="p-6 border-b flex justify-between items-center">
+                                <h3 className="text-xl font-semibold text-gray-800">📄 {selectedFile.name}</h3>
+                                <button
+                                    onClick={() => setShowFileModal(false)}
+                                    className="text-gray-500 hover:text-gray-700 text-2xl"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+                            <div className="flex-1 overflow-auto p-6">
+                                <pre className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 p-4 rounded-lg">
+                                    {content}
+                                </pre>
+                            </div>
+                            <div className="p-6 border-t flex justify-end space-x-3">
+                                <button
+                                    onClick={() => downloadFile(selectedFile)}
+                                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                                >
+                                    📥 Download
+                                </button>
+                                <button
+                                    onClick={() => setShowFileModal(false)}
+                                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderFilesTab = () => (
+                <div className="space-y-6">
+                    <div className="bg-white rounded-xl shadow-sm border">
+                        <div className="p-6 border-b">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-xl font-semibold text-gray-800">📁 Generated Files ({files.length})</h3>
+                                <div className="text-sm text-gray-600">
+                                    Total size: {files.reduce((acc, file) => acc + parseFloat(file.size), 0).toFixed(1)} KB
+                                </div>
+                            </div>
+                        </div>
+                        <div className="divide-y">
+                            {files.length === 0 ? (
+                                <div className="p-8 text-center text-gray-500">
+                                    <div className="text-6xl mb-4">📁</div>
+                                    <p className="text-lg">No files generated yet</p>
+                                    <p className="text-sm">Execute a crew to generate output files</p>
+                                </div>
+                            ) : (
+                                files.map(file => (
+                                    <div key={file.id} className="p-6 hover:bg-gray-50 transition-colors">
+                                        <div className="flex justify-between items-center">
+                                            <div className="flex-1">
+                                                <div className="flex items-center mb-2">
+                                                    <span className="text-2xl mr-3">
+                                                        {file.type === 'report' ? '📄' : 
+                                                         file.type === 'data' ? '📊' : 
+                                                         file.type === 'code' ? '💻' : '📁'}
+                                                    </span>
+                                                    <div>
+                                                        <h4 className="font-medium text-gray-900">{file.name}</h4>
+                                                        <div className="flex items-center mt-1 space-x-4 text-sm text-gray-500">
+                                                            <span>{file.size}</span>
+                                                            <span>{file.date}</span>
+                                                            <span className={`px-2 py-1 rounded-full text-xs ${
+                                                                file.status === 'completed' ? 'bg-green-100 text-green-800' : 
+                                                                'bg-yellow-100 text-yellow-800'
+                                                            }`}>
+                                                                {file.status}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex space-x-2">
+                                                <button 
+                                                    onClick={() => viewFile(file)}
+                                                    className="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    title="View file"
+                                                >
+                                                    👁️
+                                                </button>
+                                                <button 
+                                                    onClick={() => downloadFile(file)}
+                                                    className="text-green-600 hover:text-green-800 p-2 hover:bg-green-50 rounded-lg transition-colors"
+                                                    title="Download file"
+                                                >
+                                                    📥
+                                                </button>
+                                                <button 
+                                                    onClick={() => deleteFile(file.id)}
+                                                    className="text-red-600 hover:text-red-800 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Delete file"
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                    {renderFileModal()}
+                </div>
+            );
+
+            const renderFloatingActionButton = () => {
+                const canExecute = agents.length > 0 && tasks.length > 0 && executionConfig.topic && !isExecuting;
+                
+                if (!canExecute) return null;
+
+                return (
+                    <button
+                        onClick={executeCrewAPI}
+                        className="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 z-50"
+                    >
+                        <div className="flex items-center">
+                            <span className="text-2xl mr-2">🚀</span>
+                            <span className="font-medium">Run Crew</span>
+                        </div>
+                    </button>
+                );
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    {renderHeader()}
+                    {renderNavigation()}
+                    
+                    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {activeTab === 'agents' && renderAgentsTab()}
+                        {activeTab === 'tasks' && renderTasksTab()}
+                        {activeTab === 'templates' && renderTemplatesTab()}
+                        {activeTab === 'execute' && renderExecuteTab()}
+                        {activeTab === 'analytics' && renderAnalyticsTab()}
+                        {activeTab === 'files' && renderFilesTab()}
+                    </main>
+
+                    {renderFloatingActionButton()}
+                    {renderFileModal()}
+                </div>
+            );
+        }
+
+        ReactDOM.render(React.createElement(CrewAIDashboard), document.getElementById('root'));
+    </script>
+</body>
+</html>
