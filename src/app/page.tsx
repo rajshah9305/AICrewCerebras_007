@@ -10,50 +10,114 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-// Icons (simplified versions)
-const Bot = ({ className }: { className?: string }) => <div className={`${className} bg-blue-500 rounded`}>🤖</div>;
-const Users = ({ className }: { className?: string }) => <div className={`${className} bg-green-500 rounded`}>👥</div>;
-const Zap = ({ className }: { className?: string }) => <div className={`${className} bg-yellow-500 rounded`}>⚡</div>;
-const TrendingUp = ({ className }: { className?: string }) => <div className={`${className} bg-purple-500 rounded`}>📈</div>;
-const Home = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>🏠</div>;
-const Plus = ({ className }: { className?: string }) => <div className={`${className} bg-blue-500 rounded`}>➕</div>;
-const Settings = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>⚙️</div>;
-const BarChart3 = ({ className }: { className?: string }) => <div className={`${className} bg-orange-500 rounded`}>📊</div>;
-const Menu = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>☰</div>;
-const X = ({ className }: { className?: string }) => <div className={`${className} bg-red-500 rounded`}>✕</div>;
-const ArrowLeft = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>←</div>;
-const Target = ({ className }: { className?: string }) => <div className={`${className} bg-red-500 rounded`}>🎯</div>;
-const Brain = ({ className }: { className?: string }) => <div className={`${className} bg-pink-500 rounded`}>🧠</div>;
-const Workflow = ({ className }: { className?: string }) => <div className={`${className} bg-indigo-500 rounded`}>🔄</div>;
-const Shield = ({ className }: { className?: string }) => <div className={`${className} bg-green-500 rounded`}>🛡️</div>;
-const Rocket = ({ className }: { className?: string }) => <div className={`${className} bg-red-500 rounded`}>🚀</div>;
-const Activity = ({ className }: { className?: string }) => <div className={`${className} bg-blue-500 rounded`}>📊</div>;
-const Server = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>🖥️</div>;
-const Key = ({ className }: { className?: string }) => <div className={`${className} bg-yellow-500 rounded`}>🔑</div>;
-const Layers = ({ className }: { className?: string }) => <div className={`${className} bg-purple-500 rounded`}>📚</div>;
-const CheckCircle2 = ({ className }: { className?: string }) => <div className={`${className} bg-green-500 rounded`}>✅</div>;
-const Loader = ({ className }: { className?: string }) => <div className={`${className} bg-blue-500 rounded animate-spin`}>⟳</div>;
-const Eye = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>👁️</div>;
-const EyeOff = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>🙈</div>;
-const CheckCircle = ({ className }: { className?: string }) => <div className={`${className} bg-green-500 rounded`}>✓</div>;
-const Sparkles = ({ className }: { className?: string }) => <div className={`${className} bg-yellow-500 rounded`}>✨</div>;
-const Lightbulb = ({ className }: { className?: string }) => <div className={`${className} bg-yellow-500 rounded`}>💡</div>;
-const Star = ({ className }: { className?: string }) => <div className={`${className} bg-yellow-500 rounded`}>⭐</div>;
-const Search = ({ className }: { className?: string }) => <div className={`${className} bg-blue-500 rounded`}>🔍</div>;
-const Filter = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>🔽</div>;
-const SortAsc = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>↕️</div>;
-const Play = ({ className }: { className?: string }) => <div className={`${className} bg-green-500 rounded`}>▶️</div>;
-const Copy = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>📋</div>;
-const Clock = ({ className }: { className?: string }) => <div className={`${className} bg-blue-500 rounded`}>🕐</div>;
-const Globe = ({ className }: { className?: string }) => <div className={`${className} bg-blue-500 rounded`}>🌐</div>;
-const FileText = ({ className }: { className?: string }) => <div className={`${className} bg-green-500 rounded`}>📄</div>;
-const Code = ({ className }: { className?: string }) => <div className={`${className} bg-purple-500 rounded`}>💻</div>;
-const Database = ({ className }: { className?: string }) => <div className={`${className} bg-orange-500 rounded`}>🗄️</div>;
-const Mail = ({ className }: { className?: string }) => <div className={`${className} bg-pink-500 rounded`}>📧</div>;
-const Minimize2 = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>🗕</div>;
-const Monitor = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>🖥️</div>;
-const Tablet = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>📱</div>;
-const Smartphone = ({ className }: { className?: string }) => <div className={`${className} bg-gray-500 rounded`}>📱</div>;
+// SVG Icons
+const Bot = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+  </svg>
+);
+const Users = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+  </svg>
+);
+const Zap = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+  </svg>
+);
+const TrendingUp = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+  </svg>
+);
+const Home = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+  </svg>
+);
+const Plus = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+  </svg>
+);
+const Settings = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+  </svg>
+);
+const BarChart3 = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+  </svg>
+);
+const Menu = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+  </svg>
+);
+const X = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  </svg>
+);
+const ArrowLeft = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+  </svg>
+);
+const Target = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-10c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z" />
+  </svg>
+);
+const Server = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+  </svg>
+);
+const Key = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+  </svg>
+);
+const Layers = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+  </svg>
+);
+const CheckCircle2 = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+const Loader = ({ className }: { className?: string }) => (
+  <svg className={`${className} animate-spin`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+  </svg>
+);
+const Eye = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+  </svg>
+);
+const EyeOff = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+  </svg>
+);
+const CheckCircle = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+);
+const Sparkles = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+  </svg>
+);
 
 // Enhanced Agent Template Interface
 interface AgentTemplate {
